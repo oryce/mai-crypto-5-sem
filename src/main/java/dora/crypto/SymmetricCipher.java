@@ -29,16 +29,13 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
+import static java.util.Objects.requireNonNullElseGet;
 
 public final class SymmetricCipher {
 
-    private final BlockCipher cipher;
-    private final CipherModeType cipherMode;
-    private final PaddingType padding;
+    private final SymmetricCipherContext context;
+    private final Parameters parameters;
     private final byte[] key;
-    private final byte[] iv;
-    private final List<?> args;
-    private final ForkJoinPool pool;
 
     public SymmetricCipher(
         @NotNull BlockCipher cipher,
@@ -49,32 +46,25 @@ public final class SymmetricCipher {
         @Nullable List<?> args,
         @Nullable ForkJoinPool pool
     ) {
-        this.cipher = requireNonNull(cipher, "cipher");
-        this.cipherMode = requireNonNull(cipherMode, "cipher mode");
-        this.padding = requireNonNull(padding, "padding");
-        this.key = requireNonNull(key, "key");
-        this.iv = requireNonNullElse(iv, new byte[0]);
-        this.args = requireNonNullElse(args, Collections.emptyList());
-        this.pool = requireNonNullElse(pool, ForkJoinPool.commonPool());
-    }
-
-    private SymmetricCipherContext createContext() {
-        var ctx = new SymmetricCipherContext(
-            cipherMode.createMode(cipher, pool),
+        this.context = new SymmetricCipherContext(
+            cipherMode.createMode(cipher, requireNonNullElseGet(pool, ForkJoinPool::commonPool)),
             padding.createPadding()
         );
-        ctx.init(key, cipherMode.createParameters(iv, args));
-        return ctx;
+        this.parameters = cipherMode.createParameters(
+            requireNonNullElse(iv, new byte[0]),
+            requireNonNullElseGet(args, Collections::emptyList)
+        );
+        this.key = requireNonNull(key, "key");
     }
 
     public byte[] encrypt(byte[] data) throws InterruptedException {
-        var ctx = createContext();
-        return ctx.encrypt(data);
+        context.init(key, parameters);
+        return context.encrypt(data);
     }
 
     public void encryptFile(Path input, Path output)
     throws InterruptedException, IOException {
-        var ctx = createContext();
+        context.init(key, parameters);
 
         try (var fis = Files.newInputStream(input);
              var fos = Files.newOutputStream(output)) {
@@ -82,19 +72,19 @@ public final class SymmetricCipher {
             var bytesRead = 0;
 
             while ((bytesRead = fis.read(buffer)) > 0) {
-                fos.write(ctx.encrypt(buffer), 0, bytesRead);
+                fos.write(context.encrypt(buffer), 0, bytesRead);
             }
         }
     }
 
     public byte[] decrypt(byte[] data) throws InterruptedException {
-        var ctx = createContext();
-        return ctx.decrypt(data);
+        context.init(key, parameters);
+        return context.decrypt(data);
     }
 
     public void decryptFile(Path input, Path output)
     throws InterruptedException, IOException {
-        var ctx = createContext();
+        context.init(key, parameters);
 
         try (var fis = Files.newInputStream(input);
              var fos = Files.newOutputStream(output)) {
@@ -102,7 +92,7 @@ public final class SymmetricCipher {
             var bytesRead = 0;
 
             while ((bytesRead = fis.read(buffer)) > 0) {
-                fos.write(ctx.decrypt(buffer), 0, bytesRead);
+                fos.write(context.decrypt(buffer), 0, bytesRead);
             }
         }
     }
