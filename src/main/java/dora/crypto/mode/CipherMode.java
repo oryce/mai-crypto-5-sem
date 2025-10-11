@@ -3,17 +3,16 @@ package dora.crypto.mode;
 import dora.crypto.block.BlockCipher;
 
 /**
- * Cipher mode wraps a {@link BlockCipher block cipher} and operates on padded
- * data to provide encryption or decryption.
+ * Cipher mode wraps a {@link BlockCipher} and operates on padded data to
+ * provide encryption and decryption.
  * <p>
- * Cipher modes have to be initialized prior to usage. To initialize a
- * cipher mode, provide {@link Parameters}. Different implementations have
- * different parameter requirements.
+ * Cipher modes must be initialized prior to usage. Consult the implementation's
+ * documentation on the appropriate parameter types.
  */
 public interface CipherMode {
 
     /**
-     * Returns the underlying symmetric cipher.
+     * Returns the underlying block cipher.
      */
     BlockCipher cipher();
 
@@ -32,10 +31,10 @@ public interface CipherMode {
     /**
      * Encrypts padded data with the provided key.
      */
-    byte[] encrypt(byte[] data, byte[] key) throws InterruptedException;
+    byte[] encrypt(byte[] plaintext, byte[] key) throws InterruptedException;
 
     /**
      * Decrypts padded data with the provided key.
      */
-    byte[] decrypt(byte[] data, byte[] key) throws InterruptedException;
+    byte[] decrypt(byte[] ciphertext, byte[] key) throws InterruptedException;
 }

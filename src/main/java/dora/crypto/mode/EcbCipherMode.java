@@ -18,12 +18,12 @@ public final class EcbCipherMode extends AbstractCipherMode {
     }
 
     @Override
-    public byte[] encrypt(byte[] data, byte[] key) {
+    public byte[] encrypt(byte[] plaintext, byte[] key) {
         return new byte[0];
     }
 
     @Override
-    public byte[] decrypt(byte[] data, byte[] key) {
+    public byte[] decrypt(byte[] ciphertext, byte[] key) {
         return new byte[0];
     }
 }

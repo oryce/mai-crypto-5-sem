@@ -27,12 +27,12 @@ public final class CbcCipherMode extends AbstractCipherMode {
     }
 
     @Override
-    public byte[] encrypt(byte[] data, byte[] key) throws InterruptedException {
+    public byte[] encrypt(byte[] plaintext, byte[] key) throws InterruptedException {
         byte[] prevBlock = iv;
-        byte[] ciphertext = new byte[data.length];
+        byte[] ciphertext = new byte[plaintext.length];
 
-        for (int i = 0; i < data.length; i += blockSize) {
-            byte[] block = Arrays.copyOfRange(data, i, i + blockSize);
+        for (int i = 0; i < plaintext.length; i += blockSize) {
+            byte[] block = Arrays.copyOfRange(plaintext, i, i + blockSize);
 
             for (int j = 0; j < block.length; j++) {
                 block[j] ^= prevBlock[j];
@@ -47,35 +47,33 @@ public final class CbcCipherMode extends AbstractCipherMode {
     }
 
     @Override
-    public byte[] decrypt(byte[] data, byte[] key) throws InterruptedException {
+    public byte[] decrypt(byte[] ciphertext, byte[] key) throws InterruptedException {
         List<DecryptResult> results = ParallelBlockProcessor.processBlocks(
-            data, blockSize, pool, (idx, start, end) -> {
-                byte[] encrypted = Arrays.copyOfRange(data, start, end);
-                byte[] decrypted = cipher.decrypt(encrypted);
-                return new DecryptResult(encrypted, decrypted);
+            ciphertext, blockSize, pool, (idx, start, end) -> {
+                byte[] cipherBlock = Arrays.copyOfRange(ciphertext, start, end);
+                byte[] plainBlock = cipher.decrypt(cipherBlock);
+                return new DecryptResult(cipherBlock, plainBlock);
             }
         );
 
-        // XOR blocks to form the decrypted plaintext.
         byte[] prevBlock = iv;
-        byte[] plaintext = new byte[data.length];
+        byte[] plaintext = new byte[ciphertext.length];
 
         for (int i = 0; i < results.size(); i++) {
             DecryptResult result = results.get(i);
-            byte[] encrypted = result.encrypted();
-            byte[] decrypted = result.decrypted();
+            byte[] cipherBlock = result.cipherBlock();
+            byte[] plainBlock = result.plainBlock();
 
-            for (int j = 0; j < decrypted.length; j++) {
-                decrypted[j] ^= prevBlock[j];
+            for (int j = 0; j < plainBlock.length; j++) {
+                plaintext[i * blockSize + j] = (byte) (plainBlock[j] ^ prevBlock[j]);
             }
 
-            System.arraycopy(decrypted, 0, plaintext, i * blockSize, decrypted.length);
-            prevBlock = encrypted;
+            prevBlock = cipherBlock;
         }
 
         return plaintext;
     }
 
-    private record DecryptResult(byte[] encrypted, byte[] decrypted) {
+    private record DecryptResult(byte[] cipherBlock, byte[] plainBlock) {
     }
 }

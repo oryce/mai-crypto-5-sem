@@ -1,7 +1,7 @@
 package dora.crypto.mode;
 
 /**
- * A marker interface for cipher mode parameters.
+ * Marker interface for cipher mode parameters.
  * <p>
  * Implementations of {@link CipherMode} are expected to up-cast to required
  * parameter types, such as {@link IvParameters}.
