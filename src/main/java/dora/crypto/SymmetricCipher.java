@@ -47,7 +47,10 @@ public final class SymmetricCipher {
         @Nullable ForkJoinPool pool
     ) {
         this.context = new SymmetricCipherContext(
-            cipherMode.createMode(cipher, requireNonNullElseGet(pool, ForkJoinPool::commonPool)),
+            cipherMode.createMode(
+                requireNonNull(cipher, "cipher"),
+                requireNonNullElseGet(pool, ForkJoinPool::commonPool)
+            ),
             padding.createPadding()
         );
         this.parameters = cipherMode.createParameters(
