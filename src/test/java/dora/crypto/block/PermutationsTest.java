@@ -1,6 +1,5 @@
-package dora.crypto;
+package dora.crypto.block;
 
-import dora.crypto.block.Permutations;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.Collectors;

@@ -2,12 +2,14 @@ package dora.crypto.mode;
 
 import dora.crypto.block.BlockCipher;
 
-public abstract class AbstractCipherMode implements CipherMode {
+abstract class AbstractCipherMode implements CipherMode {
 
     protected final BlockCipher cipher;
+    protected final int blockSize;
 
     public AbstractCipherMode(BlockCipher cipher) {
         this.cipher = cipher;
+        this.blockSize = cipher.blockSize();
     }
 
     @Override
