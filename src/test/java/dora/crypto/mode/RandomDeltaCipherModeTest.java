@@ -1,18 +1,19 @@
 package dora.crypto.mode;
 
-import dora.crypto.mode.Parameters.IvParameters;
+import dora.crypto.mode.RandomDeltaCipherMode.RandomDeltaParameters;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
+import net.jqwik.api.constraints.Positive;
 import net.jqwik.api.constraints.Size;
 
 import java.util.concurrent.ForkJoinPool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CbcCipherModeTest extends CipherModeTest {
+public class RandomDeltaCipherModeTest extends CipherModeTest {
 
-    CbcCipherModeTest() {
-        super(new CbcCipherMode(
+    RandomDeltaCipherModeTest() {
+        super(new RandomDeltaCipherMode(
             new MockBlockCipher(16),
             ForkJoinPool.commonPool()
         ));
@@ -22,12 +23,14 @@ public class CbcCipherModeTest extends CipherModeTest {
     void decryptedCiphertextEqualsPlaintext(
         @ForAll("multipleOfBlockSize") byte[] plaintext,
         @ForAll @Size(min = 1) byte[] key,
-        @ForAll @Size(value = 16) byte[] iv
+        @ForAll @Size(value = 8) byte[] nonce,
+        @ForAll @Positive int counter,
+        @ForAll long seed
     ) throws InterruptedException {
-        cipherMode.init(new IvParameters(iv));
+        cipherMode.init(new RandomDeltaParameters(nonce, counter, seed));
         byte[] encrypted = cipherMode.encrypt(plaintext, key);
 
-        cipherMode.init(new IvParameters(iv));
+        cipherMode.init(new RandomDeltaParameters(nonce, counter, seed));
         byte[] decrypted = cipherMode.decrypt(encrypted, key);
 
         assertThat(decrypted).isEqualTo(plaintext);

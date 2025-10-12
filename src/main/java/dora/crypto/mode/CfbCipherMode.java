@@ -23,11 +23,16 @@ public final class CfbCipherMode extends AbstractCipherMode {
             throw new IllegalArgumentException("expected IvParameters");
         }
 
-        iv = ivParam;
+        if (ivParam.length != blockSize) {
+            throw new IllegalArgumentException(
+                "expected %d-byte IV".formatted(blockSize));
+        }
+
+        iv = ivParam.clone();
     }
 
     @Override
-    public byte[] encrypt(byte[] plaintext, byte[] key) throws InterruptedException {
+    public byte[] encryptBlocks(byte[] plaintext) {
         byte[] prevBlock = iv;
         byte[] ciphertext = new byte[plaintext.length];
 
@@ -46,7 +51,7 @@ public final class CfbCipherMode extends AbstractCipherMode {
     }
 
     @Override
-    public byte[] decrypt(byte[] ciphertext, byte[] key) throws InterruptedException {
+    public byte[] decryptBlocks(byte[] ciphertext) throws InterruptedException {
         List<EncryptResult> results = ParallelBlockProcessor.processBlocks(
             ciphertext, blockSize, pool, (idx, start, end) -> {
                 byte[] feedbackBlock;

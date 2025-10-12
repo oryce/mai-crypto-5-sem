@@ -5,12 +5,14 @@ import dora.crypto.mode.CbcCipherMode;
 import dora.crypto.mode.CfbCipherMode;
 import dora.crypto.mode.CipherMode;
 import dora.crypto.mode.CtrCipherMode;
+import dora.crypto.mode.CtrCipherMode.CtrParameters;
 import dora.crypto.mode.EcbCipherMode;
 import dora.crypto.mode.OfbCipherMode;
 import dora.crypto.mode.Parameters;
 import dora.crypto.mode.Parameters.IvParameters;
 import dora.crypto.mode.PcbcCipherMode;
 import dora.crypto.mode.RandomDeltaCipherMode;
+import dora.crypto.mode.RandomDeltaCipherMode.RandomDeltaParameters;
 import dora.crypto.padding.AnsiX923Padding;
 import dora.crypto.padding.Iso10126Padding;
 import dora.crypto.padding.Padding;
@@ -104,11 +106,11 @@ public final class SymmetricCipher {
 
         CBC(CbcCipherMode::new, ParameterCreator.iv()),
         CFB(CfbCipherMode::new, ParameterCreator.iv()),
-        CTR(CtrCipherMode::new, ParameterCreator.iv()),
+        CTR(CtrCipherMode::new, ParameterCreator.ctr()),
         ECB(EcbCipherMode::new, ParameterCreator.none()),
         OFB((cipher, pool) -> new OfbCipherMode(cipher), ParameterCreator.iv()),
         PCBC((cipher, pool) -> new PcbcCipherMode(cipher), ParameterCreator.iv()),
-        RANDOM_DELTA((cipher, pool) -> new RandomDeltaCipherMode(cipher), ParameterCreator.iv());
+        RANDOM_DELTA(RandomDeltaCipherMode::new, ParameterCreator.randomDelta());
 
         private final InstanceCreator instanceCreator;
         private final ParameterCreator parametersCreator;
@@ -146,6 +148,27 @@ public final class SymmetricCipher {
 
             static ParameterCreator iv() {
                 return (iv, args) -> new IvParameters(iv);
+            }
+
+            static ParameterCreator ctr() {
+                return (iv, args) -> new CtrParameters(
+                    iv,
+                    requireNonNullElse(argumentAt(args, 0), 0)
+                );
+            }
+
+            static ParameterCreator randomDelta() {
+                return (iv, args) -> new RandomDeltaParameters(
+                    iv,
+                    requireNonNullElse(argumentAt(args, 0), 0),
+                    argumentAt(args, 1)
+                );
+            }
+
+            @SuppressWarnings("unchecked")
+            private static <T> @Nullable T argumentAt(List<?> args, int idx) {
+                if (args.size() < idx) return null;
+                return (T) args.get(idx);
             }
         }
     }

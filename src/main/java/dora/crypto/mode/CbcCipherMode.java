@@ -23,31 +23,36 @@ public final class CbcCipherMode extends AbstractCipherMode {
             throw new IllegalArgumentException("expected IvParameters");
         }
 
-        iv = ivParam;
+        if (ivParam.length != blockSize) {
+            throw new IllegalArgumentException(
+                "expected %d-byte IV".formatted(blockSize));
+        }
+
+        iv = ivParam.clone();
     }
 
     @Override
-    public byte[] encrypt(byte[] plaintext, byte[] key) throws InterruptedException {
+    public byte[] encryptBlocks(byte[] plaintext) {
         byte[] prevBlock = iv;
         byte[] ciphertext = new byte[plaintext.length];
 
         for (int i = 0; i < plaintext.length; i += blockSize) {
-            byte[] block = Arrays.copyOfRange(plaintext, i, i + blockSize);
+            byte[] plainBlock = Arrays.copyOfRange(plaintext, i, i + blockSize);
 
-            for (int j = 0; j < block.length; j++) {
-                block[j] ^= prevBlock[j];
+            for (int j = 0; j < plainBlock.length; j++) {
+                plainBlock[j] ^= prevBlock[j];
             }
 
-            byte[] encrypted = cipher.encrypt(block);
-            System.arraycopy(encrypted, 0, ciphertext, i, encrypted.length);
-            prevBlock = encrypted;
+            byte[] cipherBlock = cipher.encrypt(plainBlock);
+            System.arraycopy(cipherBlock, 0, ciphertext, i, cipherBlock.length);
+            prevBlock = cipherBlock;
         }
 
         return ciphertext;
     }
 
     @Override
-    public byte[] decrypt(byte[] ciphertext, byte[] key) throws InterruptedException {
+    public byte[] decryptBlocks(byte[] ciphertext) throws InterruptedException {
         List<DecryptResult> results = ParallelBlockProcessor.processBlocks(
             ciphertext, blockSize, pool, (idx, start, end) -> {
                 byte[] cipherBlock = Arrays.copyOfRange(ciphertext, start, end);

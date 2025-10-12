@@ -1,18 +1,19 @@
 package dora.crypto.mode;
 
-import dora.crypto.mode.Parameters.IvParameters;
+import dora.crypto.mode.CtrCipherMode.CtrParameters;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
+import net.jqwik.api.constraints.Positive;
 import net.jqwik.api.constraints.Size;
 
 import java.util.concurrent.ForkJoinPool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CbcCipherModeTest extends CipherModeTest {
+public class CtrCipherModeTest extends CipherModeTest {
 
-    CbcCipherModeTest() {
-        super(new CbcCipherMode(
+    CtrCipherModeTest() {
+        super(new CtrCipherMode(
             new MockBlockCipher(16),
             ForkJoinPool.commonPool()
         ));
@@ -22,12 +23,13 @@ public class CbcCipherModeTest extends CipherModeTest {
     void decryptedCiphertextEqualsPlaintext(
         @ForAll("multipleOfBlockSize") byte[] plaintext,
         @ForAll @Size(min = 1) byte[] key,
-        @ForAll @Size(value = 16) byte[] iv
+        @ForAll @Size(value = 8) byte[] nonce,
+        @ForAll @Positive int counter
     ) throws InterruptedException {
-        cipherMode.init(new IvParameters(iv));
+        cipherMode.init(new CtrParameters(nonce, counter));
         byte[] encrypted = cipherMode.encrypt(plaintext, key);
 
-        cipherMode.init(new IvParameters(iv));
+        cipherMode.init(new CtrParameters(nonce, counter));
         byte[] decrypted = cipherMode.decrypt(encrypted, key);
 
         assertThat(decrypted).isEqualTo(plaintext);
