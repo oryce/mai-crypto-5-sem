@@ -1,6 +1,6 @@
 package dora.crypto.block;
 
-import net.jqwik.api.*;
+import net.jqwik.api.Example;
 
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
