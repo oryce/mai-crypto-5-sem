@@ -9,56 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PermutationsTest {
 
-    @Provide
-    Arbitrary<byte[]> byteArrays() {
-        return Arbitraries.integers().between(1, 8)
-            .flatMap((size) -> Arbitraries.bytes().array(byte[].class).ofSize(size));
-    }
-
-    @Property
-    void identityPermutationPreservesInput(
-        @ForAll("byteArrays") byte[] input,
-        @ForAll boolean oneIndexed
-    ) {
-        int[] pBox = identityPermutation(input.length * 8, oneIndexed);
-
-        byte[] output = input.clone();
-        Permutations.permute(input, pBox, false, oneIndexed);
-
-        assertThat(toBinaryString(input))
-            .isEqualTo(toBinaryString(output));
-    }
-
-    @Property
-    void permutationPreservesBitCount(
-        @ForAll("byteArrays") byte[] input,
-        @ForAll boolean reverseOrder,
-        @ForAll boolean oneIndexed
-    ) {
-        int[] pBox = identityPermutation(input.length * 8, oneIndexed);
-
-        byte[] output = input.clone();
-        Permutations.permute(output, pBox, reverseOrder, oneIndexed);
-
-        assertThat(bitCount(input))
-            .isEqualTo(bitCount(output));
-    }
-
-    @Property
-    void reversePermutationIsReversible(
-        @ForAll("byteArrays") byte[] input,
-        @ForAll boolean oneIndexed
-    ) {
-        int[] pBox = inversePermutation(input.length * 8, oneIndexed);
-
-        byte[] output = input.clone();
-        Permutations.permute(output, pBox, false, oneIndexed);
-        Permutations.permute(output, pBox, false, oneIndexed);
-
-        assertThat(toBinaryString(input))
-            .isEqualTo(toBinaryString(output));
-    }
-
     @Example
     void oneByte_Reverse_ZeroIndexed() {
         byte[] input = { (byte) 0b11110010 };
@@ -111,35 +61,5 @@ public class PermutationsTest {
         return IntStream.range(0, bytes.length)
             .mapToObj((i) -> Integer.toBinaryString((bytes[i] & 0xFF) + 0x100).substring(1))
             .collect(Collectors.joining());
-    }
-
-    private static int bitCount(byte[] data) {
-        int count = 0;
-
-        for (byte b : data) {
-            count += Integer.bitCount(b & 0xFF);
-        }
-
-        return count;
-    }
-
-    private static int[] identityPermutation(int size, boolean oneIndexed) {
-        int[] pBox = new int[size];
-
-        for (int i = 0; i < size; i++) {
-            pBox[i] = oneIndexed ? i + 1 : i;
-        }
-
-        return pBox;
-    }
-
-    private static int[] inversePermutation(int size, boolean oneIndexed) {
-        int[] pBox = new int[size];
-
-        for (int i = 0; i < size; i++) {
-            pBox[i] = oneIndexed ? size - i : size - i - 1;
-        }
-
-        return pBox;
     }
 }

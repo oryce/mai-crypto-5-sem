@@ -1,14 +1,19 @@
 package dora.crypto.padding;
 
-public final class Pkcs7Padding implements Padding {
+import java.util.Arrays;
+
+public final class Pkcs7Padding extends AbstractPadding {
 
     @Override
-    public byte[] pad(byte[] data, int blockSize) {
-        return new byte[0];
+    protected byte[] padding(int remaining, int blockSize) {
+        if (remaining == 0) remaining = blockSize;
+        byte[] padded = new byte[remaining];
+        Arrays.fill(padded, (byte) remaining);
+        return padded;
     }
 
     @Override
-    public byte[] unpad(byte[] data, int blockSize) {
-        return new byte[0];
+    protected int paddingSize(byte[] data, int blockSize) {
+        return data[data.length - 1] & 0xff;
     }
 }

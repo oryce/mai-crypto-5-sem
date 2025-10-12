@@ -1,14 +1,24 @@
 package dora.crypto.padding;
 
-public final class ZerosPadding implements Padding {
+public final class ZerosPadding extends AbstractPadding {
 
     @Override
-    public byte[] pad(byte[] data, int blockSize) {
-        return new byte[0];
+    protected byte[] padding(int remaining, int blockSize) {
+        return new byte[remaining];
     }
 
     @Override
-    public byte[] unpad(byte[] data, int blockSize) {
-        return new byte[0];
+    protected int paddingSize(byte[] data, int blockSize) {
+        int size = 0;
+        int i = data.length - 1;
+        int j = blockSize - 1;
+
+        while (data[i] == 0 && j >= 0) {
+            size++;
+            i--;
+            j--;
+        }
+
+        return size;
     }
 }
