@@ -5,7 +5,7 @@ import dora.crypto.mode.Parameters.IvParameters;
 
 public final class OfbCipherMode extends AbstractCipherMode {
 
-    private byte[] iv;
+    private byte[] prevBlock;
 
     public OfbCipherMode(BlockCipher cipher) {
         super(cipher);
@@ -22,7 +22,7 @@ public final class OfbCipherMode extends AbstractCipherMode {
                 "expected %d-byte IV".formatted(blockSize));
         }
 
-        iv = ivParam.clone();
+        prevBlock = ivParam.clone();
     }
 
     @Override
@@ -36,7 +36,6 @@ public final class OfbCipherMode extends AbstractCipherMode {
     }
 
     private byte[] processBlocks(byte[] data) {
-        byte[] prevBlock = iv;
         byte[] result = new byte[data.length];
 
         for (int i = 0; i < data.length; i += blockSize) {

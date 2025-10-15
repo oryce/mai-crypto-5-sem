@@ -10,7 +10,8 @@ import java.util.concurrent.ForkJoinPool;
 public final class CbcCipherMode extends AbstractCipherMode {
 
     private final ForkJoinPool pool;
-    private byte[] iv;
+
+    private byte[] prevBlock;
 
     public CbcCipherMode(BlockCipher cipher, ForkJoinPool pool) {
         super(cipher);
@@ -28,12 +29,11 @@ public final class CbcCipherMode extends AbstractCipherMode {
                 "expected %d-byte IV".formatted(blockSize));
         }
 
-        iv = ivParam.clone();
+        prevBlock = ivParam.clone();
     }
 
     @Override
     protected byte[] encryptBlocks(byte[] plaintext) {
-        byte[] prevBlock = iv;
         byte[] ciphertext = new byte[plaintext.length];
 
         for (int i = 0; i < plaintext.length; i += blockSize) {
@@ -61,7 +61,6 @@ public final class CbcCipherMode extends AbstractCipherMode {
             }
         );
 
-        byte[] prevBlock = iv;
         byte[] plaintext = new byte[ciphertext.length];
 
         for (int i = 0; i < results.size(); i++) {

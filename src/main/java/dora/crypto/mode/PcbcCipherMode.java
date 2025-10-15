@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public final class PcbcCipherMode extends AbstractCipherMode {
 
-    private byte[] iv;
+    private byte[] prevBlock;
 
     public PcbcCipherMode(BlockCipher cipher) {
         super(cipher);
@@ -24,12 +24,11 @@ public final class PcbcCipherMode extends AbstractCipherMode {
                 "expected %d-byte IV".formatted(blockSize));
         }
 
-        iv = ivParam.clone();
+        prevBlock = ivParam.clone();
     }
 
     @Override
     protected byte[] encryptBlocks(byte[] plaintext) {
-        byte[] prevBlock = iv;
         byte[] ciphertext = new byte[plaintext.length];
 
         for (int i = 0; i < plaintext.length; i += blockSize) {
@@ -46,7 +45,6 @@ public final class PcbcCipherMode extends AbstractCipherMode {
 
     @Override
     protected byte[] decryptBlocks(byte[] ciphertext) {
-        byte[] prevBlock = iv;
         byte[] plaintext = new byte[ciphertext.length];
 
         for (int i = 0; i < ciphertext.length; i += blockSize) {
