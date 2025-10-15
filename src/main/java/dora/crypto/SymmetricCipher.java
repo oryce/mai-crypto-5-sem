@@ -140,16 +140,16 @@ public final class SymmetricCipher {
 
             static ParameterCreator ctr() {
                 return (iv, args) -> new CtrParameters(
-                    iv,
-                    requireNonNullElse(argumentAt(args, 0), 0)
+                     /* nonce   */ iv,
+                    /* counter */ requireNonNullElse(argumentAt(args, 0), 0)
                 );
             }
 
             static ParameterCreator randomDelta() {
                 return (iv, args) -> new RandomDeltaParameters(
-                    iv,
-                    requireNonNullElse(argumentAt(args, 0), 0),
-                    argumentAt(args, 1)
+                    /* nonce   */ iv,
+                    /* counter */ requireNonNullElse(argumentAt(args, 0), 0),
+                    /* seed    */ argumentAt(args, 1)
                 );
             }
 
