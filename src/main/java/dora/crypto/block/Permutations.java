@@ -1,4 +1,4 @@
-package dora.crypto;
+package dora.crypto.block;
 
 public final class Permutations {
 
