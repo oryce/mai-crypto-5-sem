@@ -13,7 +13,7 @@ public final class ZerosPadding extends AbstractPadding {
         int i = data.length - 1;
         int j = blockSize - 1;
 
-        while (data[i] == 0 && j >= 0) {
+        while (j >= 0 && data[i] == 0) {
             size++;
             i--;
             j--;

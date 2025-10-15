@@ -61,12 +61,7 @@ public final class SymmetricCipher {
 
         try (var fis = Files.newInputStream(input);
              var fos = Files.newOutputStream(output)) {
-            var buffer = new byte[65536];
-            var bytesRead = 0;
-
-            while ((bytesRead = fis.read(buffer)) > 0) {
-                fos.write(context.encrypt(buffer), 0, bytesRead);
-            }
+            context.encryptStream(fis, fos);
         }
     }
 
@@ -81,12 +76,7 @@ public final class SymmetricCipher {
 
         try (var fis = Files.newInputStream(input);
              var fos = Files.newOutputStream(output)) {
-            var buffer = new byte[65536];
-            var bytesRead = 0;
-
-            while ((bytesRead = fis.read(buffer)) > 0) {
-                fos.write(context.decrypt(buffer), 0, bytesRead);
-            }
+            context.decryptStream(fis, fos);
         }
     }
 
