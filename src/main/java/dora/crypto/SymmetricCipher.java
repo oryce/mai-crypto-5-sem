@@ -56,7 +56,7 @@ public final class SymmetricCipher {
     }
 
     public void encryptFile(Path input, Path output)
-    throws InterruptedException, IOException {
+    throws IOException, InterruptedException {
         context.init(key, parameters);
 
         try (var fis = Files.newInputStream(input);
@@ -76,7 +76,7 @@ public final class SymmetricCipher {
     }
 
     public void decryptFile(Path input, Path output)
-    throws InterruptedException, IOException {
+    throws IOException, InterruptedException {
         context.init(key, parameters);
 
         try (var fis = Files.newInputStream(input);

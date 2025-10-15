@@ -1,7 +1,8 @@
-package dora.crypto.block.des;
+package dora.crypto.block;
 
-import dora.crypto.block.*;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
 
 import static java.util.Objects.requireNonNull;
 
@@ -37,15 +38,14 @@ public class FeistelBlockCipher implements BlockCipher {
 
     @Override
     public byte[] encrypt(byte[] plaintext) {
-        if (roundKeys == null) {
+        if (roundKeys == null)
             throw new IllegalStateException("Cipher is not initialized");
-        }
+        if (plaintext.length != blockSize)
+            throw new IllegalArgumentException("Invalid block size");
 
         // (1) Split the block into two equal parts.
-        byte[] l = new byte[plaintext.length / 2];
-        System.arraycopy(plaintext, 0, l, 0, l.length);
-        byte[] r = new byte[plaintext.length / 2];
-        System.arraycopy(plaintext, l.length, r, 0, r.length);
+        byte[] l = Arrays.copyOfRange(plaintext, 0, plaintext.length / 2);
+        byte[] r = Arrays.copyOfRange(plaintext, plaintext.length / 2, plaintext.length);
 
         // (2) For each round compute:
         //   - L_i+1 = R_i
@@ -72,15 +72,14 @@ public class FeistelBlockCipher implements BlockCipher {
 
     @Override
     public byte[] decrypt(byte[] ciphertext) {
-        if (roundKeys == null) {
+        if (roundKeys == null)
             throw new IllegalStateException("Cipher is not initialized");
-        }
+        if (ciphertext.length != blockSize)
+            throw new IllegalArgumentException("Invalid block size");
 
         // (1) Split the block into two equal parts.
-        byte[] r = new byte[ciphertext.length / 2];
-        System.arraycopy(ciphertext, 0, r, 0, r.length);
-        byte[] l = new byte[ciphertext.length / 2];
-        System.arraycopy(ciphertext, r.length, l, 0, l.length);
+        byte[] r = Arrays.copyOfRange(ciphertext, 0, ciphertext.length / 2);
+        byte[] l = Arrays.copyOfRange(ciphertext, ciphertext.length / 2, ciphertext.length);
 
         // (2) For each round compute:
         //   - R_i = R_i+1

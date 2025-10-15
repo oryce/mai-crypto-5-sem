@@ -27,11 +27,11 @@ public class RandomDeltaCipherModeTest extends CipherModeTest {
         @ForAll @Positive int counter,
         @ForAll long seed
     ) throws InterruptedException {
-        cipherMode.init(new RandomDeltaParameters(nonce, counter, seed));
-        byte[] encrypted = cipherMode.encrypt(plaintext, key);
+        cipherMode.init(key, new RandomDeltaParameters(nonce, counter, seed));
+        byte[] encrypted = cipherMode.encrypt(plaintext);
 
-        cipherMode.init(new RandomDeltaParameters(nonce, counter, seed));
-        byte[] decrypted = cipherMode.decrypt(encrypted, key);
+        cipherMode.init(key, new RandomDeltaParameters(nonce, counter, seed));
+        byte[] decrypted = cipherMode.decrypt(encrypted);
 
         assertThat(decrypted).isEqualTo(plaintext);
     }

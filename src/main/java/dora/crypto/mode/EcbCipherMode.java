@@ -16,7 +16,7 @@ public final class EcbCipherMode extends AbstractCipherMode {
     }
 
     @Override
-    public void init(Parameters parameters) {
+    protected void initMode(Parameters parameters) {
         if (!(parameters instanceof NoParameters)) {
             throw new IllegalArgumentException("expected NoParameters");
         }

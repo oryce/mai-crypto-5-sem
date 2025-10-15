@@ -17,7 +17,7 @@ public final class CtrCipherMode extends AbstractCipherMode {
     }
 
     @Override
-    public void init(Parameters parameters) {
+    protected void initMode(Parameters parameters) {
         if (!(parameters instanceof CtrParameters(
             byte[] nonceParam,
             int counterParam
@@ -42,12 +42,12 @@ public final class CtrCipherMode extends AbstractCipherMode {
     }
 
     @Override
-    public byte[] encryptBlocks(byte[] plaintext) throws InterruptedException {
+    protected byte[] encryptBlocks(byte[] plaintext) throws InterruptedException {
         return processBlocks(plaintext);
     }
 
     @Override
-    public byte[] decryptBlocks(byte[] ciphertext) throws InterruptedException {
+    protected byte[] decryptBlocks(byte[] ciphertext) throws InterruptedException {
         return processBlocks(ciphertext);
     }
 

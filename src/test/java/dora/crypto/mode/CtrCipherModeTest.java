@@ -26,11 +26,11 @@ public class CtrCipherModeTest extends CipherModeTest {
         @ForAll @Size(value = 8) byte[] nonce,
         @ForAll @Positive int counter
     ) throws InterruptedException {
-        cipherMode.init(new CtrParameters(nonce, counter));
-        byte[] encrypted = cipherMode.encrypt(plaintext, key);
+        cipherMode.init(key, new CtrParameters(nonce, counter));
+        byte[] encrypted = cipherMode.encrypt(plaintext);
 
-        cipherMode.init(new CtrParameters(nonce, counter));
-        byte[] decrypted = cipherMode.decrypt(encrypted, key);
+        cipherMode.init(key, new CtrParameters(nonce, counter));
+        byte[] decrypted = cipherMode.decrypt(encrypted);
 
         assertThat(decrypted).isEqualTo(plaintext);
     }

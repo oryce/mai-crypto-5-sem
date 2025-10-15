@@ -1,4 +1,4 @@
-package dora.crypto.block;
+package dora.crypto;
 
 import net.jqwik.api.Example;
 
@@ -15,9 +15,9 @@ public class PermutationsTest {
         byte[] expected = { (byte) 0b01001111 };
         int[] pBox = { 0, 1, 2, 3, 4, 5, 6, 7 };
 
-        Permutations.permute(input, pBox, true, false);
+        byte[] output = Permutations.permute(input, pBox, true, false);
 
-        assertThat(toBinaryString(input))
+        assertThat(toBinaryString(output))
             .isEqualTo(toBinaryString(expected));
     }
 
@@ -27,9 +27,9 @@ public class PermutationsTest {
         byte[] expected = { (byte) 0b01101110 };
         int[] pBox = { 4, 5, 1, 2, 3, 6, 8, 7 };
 
-        Permutations.permute(input, pBox, false, true);
+        byte[] output = Permutations.permute(input, pBox, false, true);
 
-        assertThat(toBinaryString(input))
+        assertThat(toBinaryString(output))
             .isEqualTo(toBinaryString(expected));
     }
 
@@ -39,9 +39,9 @@ public class PermutationsTest {
         byte[] expected = { (byte) 0b01010011, (byte) 0b01011010 };
         int[] pBox = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
-        Permutations.permute(input, pBox, true, false);
+        byte[] output = Permutations.permute(input, pBox, true, false);
 
-        assertThat(toBinaryString(input))
+        assertThat(toBinaryString(output))
             .isEqualTo(toBinaryString(expected));
     }
 
@@ -51,9 +51,33 @@ public class PermutationsTest {
         byte[] expected = { (byte) 0b01010011, (byte) 0b01011010 };
         int[] pBox = new int[] { 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
 
-        Permutations.permute(input, pBox, false, true);
+        byte[] output = Permutations.permute(input, pBox, false, true);
 
-        assertThat(toBinaryString(input))
+        assertThat(toBinaryString(output))
+            .isEqualTo(toBinaryString(expected));
+    }
+
+    @Example
+    void oneByte_Expand() {
+        byte[] input = { (byte) 0b00000001 };
+        byte[] expected = { (byte) 0b11111111, (byte) 0b11111111 };
+        int[] pBox = new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
+        byte[] output = Permutations.permute(input, pBox, true, true);
+
+        assertThat(toBinaryString(output))
+            .isEqualTo(toBinaryString(expected));
+    }
+
+    @Example
+    void multipleBytes_Compress() {
+        byte[] input = { (byte) 0b11111111, (byte) 0b11111111 };
+        byte[] expected = { (byte) 0b10000000 };
+        int[] pBox = new int[] { 1 };
+
+        byte[] output = Permutations.permute(input, pBox, true, true);
+
+        assertThat(toBinaryString(output))
             .isEqualTo(toBinaryString(expected));
     }
 

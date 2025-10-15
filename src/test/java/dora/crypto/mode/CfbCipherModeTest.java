@@ -24,11 +24,11 @@ public class CfbCipherModeTest extends CipherModeTest {
         @ForAll @Size(min = 1) byte[] key,
         @ForAll @Size(value = 16) byte[] iv
     ) throws InterruptedException {
-        cipherMode.init(new IvParameters(iv));
-        byte[] encrypted = cipherMode.encrypt(plaintext, key);
+        cipherMode.init(key, new IvParameters(iv));
+        byte[] encrypted = cipherMode.encrypt(plaintext);
 
-        cipherMode.init(new IvParameters(iv));
-        byte[] decrypted = cipherMode.decrypt(encrypted, key);
+        cipherMode.init(key, new IvParameters(iv));
+        byte[] decrypted = cipherMode.decrypt(encrypted);
 
         assertThat(decrypted).isEqualTo(plaintext);
     }

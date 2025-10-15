@@ -26,15 +26,15 @@ public interface CipherMode {
     /**
      * Initializes the cipher mode.
      */
-    void init(Parameters parameters);
+    void init(byte[] key, Parameters parameters);
 
     /**
      * Encrypts padded data with the provided key.
      */
-    byte[] encrypt(byte[] plaintext, byte[] key) throws InterruptedException;
+    byte[] encrypt(byte[] plaintext) throws InterruptedException;
 
     /**
      * Decrypts padded data with the provided key.
      */
-    byte[] decrypt(byte[] ciphertext, byte[] key) throws InterruptedException;
+    byte[] decrypt(byte[] ciphertext) throws InterruptedException;
 }

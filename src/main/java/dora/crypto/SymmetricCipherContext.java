@@ -11,33 +11,25 @@ public final class SymmetricCipherContext {
     private final CipherMode cipherMode;
     private final Padding padding;
 
-    private byte[] key;
-
     public SymmetricCipherContext(CipherMode cipherMode, Padding padding) {
         this.cipherMode = requireNonNull(cipherMode, "cipher mode");
         this.padding = requireNonNull(padding, "padding");
     }
 
     public void init(byte[] key, Parameters parameters) {
-        this.key = requireNonNull(key, "key");
-        cipherMode.init(requireNonNull(parameters, "parameters"));
+        cipherMode.init(
+            requireNonNull(key, "key"),
+            requireNonNull(parameters, "parameters")
+        );
     }
 
     public byte[] encrypt(byte[] data) throws InterruptedException {
-        if (key == null) {
-            throw new IllegalStateException("Cipher is not initialized");
-        }
-
         byte[] padded = padding.pad(requireNonNull(data, "data"), cipherMode.blockSize());
-        return cipherMode.encrypt(padded, key);
+        return cipherMode.encrypt(padded);
     }
 
     public byte[] decrypt(byte[] data) throws InterruptedException {
-        if (key == null) {
-            throw new IllegalStateException("Cipher is not initialized");
-        }
-
-        byte[] decrypted = cipherMode.decrypt(requireNonNull(data, "data"), key);
+        byte[] decrypted = cipherMode.decrypt(requireNonNull(data, "data"));
         return padding.unpad(decrypted, cipherMode.blockSize());
     }
 }

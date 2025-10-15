@@ -22,7 +22,7 @@ public final class RandomDeltaCipherMode extends AbstractCipherMode {
     }
 
     @Override
-    public void init(Parameters parameters) {
+    protected void initMode(Parameters parameters) {
         if (!(parameters instanceof RandomDeltaParameters(
             byte[] nonceParam,
             int counterParam,

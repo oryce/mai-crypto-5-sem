@@ -14,7 +14,7 @@ public final class PcbcCipherMode extends AbstractCipherMode {
     }
 
     @Override
-    public void init(Parameters parameters) {
+    protected void initMode(Parameters parameters) {
         if (!(parameters instanceof IvParameters(byte[] ivParam))) {
             throw new IllegalArgumentException("expected IvParameters");
         }

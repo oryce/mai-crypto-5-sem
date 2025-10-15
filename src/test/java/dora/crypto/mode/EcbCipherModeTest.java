@@ -22,11 +22,11 @@ public class EcbCipherModeTest extends CipherModeTest {
         @ForAll("multipleOfBlockSize") byte[] plaintext,
         @ForAll @Size(min = 1) byte[] key
     ) throws InterruptedException {
-        cipherMode.init(Parameters.NO_PARAMETERS);
-        byte[] encrypted = cipherMode.encrypt(plaintext, key);
+        cipherMode.init(key, Parameters.NO_PARAMETERS);
+        byte[] encrypted = cipherMode.encrypt(plaintext);
 
-        cipherMode.init(Parameters.NO_PARAMETERS);
-        byte[] decrypted = cipherMode.decrypt(encrypted, key);
+        cipherMode.init(key, Parameters.NO_PARAMETERS);
+        byte[] decrypted = cipherMode.decrypt(encrypted);
 
         assertThat(decrypted).isEqualTo(plaintext);
     }

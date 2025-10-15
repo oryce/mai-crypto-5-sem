@@ -18,13 +18,17 @@ abstract class AbstractCipherMode implements CipherMode {
     }
 
     @Override
-    public byte[] encrypt(byte[] plaintext, byte[] key)
-    throws InterruptedException {
-        if (plaintext.length % blockSize != 0) {
-            throw new IllegalArgumentException("Plaintext not multiple of block size");
-        }
-
+    public void init(byte[] key, Parameters parameters) {
         cipher.init(key);
+        initMode(parameters);
+    }
+
+    protected abstract void initMode(Parameters parameters);
+
+    @Override
+    public byte[] encrypt(byte[] plaintext) throws InterruptedException {
+        if (plaintext.length % blockSize != 0)
+            throw new IllegalArgumentException("Plaintext not multiple of block size");
         return encryptBlocks(plaintext);
     }
 
@@ -32,13 +36,9 @@ abstract class AbstractCipherMode implements CipherMode {
     throws InterruptedException;
 
     @Override
-    public byte[] decrypt(byte[] ciphertext, byte[] key)
-    throws InterruptedException {
-        if (ciphertext.length % blockSize != 0) {
+    public byte[] decrypt(byte[] ciphertext) throws InterruptedException {
+        if (ciphertext.length % blockSize != 0)
             throw new IllegalArgumentException("Ciphertext not multiple of block size");
-        }
-
-        cipher.init(key);
         return decryptBlocks(ciphertext);
     }
 
