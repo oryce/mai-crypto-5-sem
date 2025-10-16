@@ -81,6 +81,8 @@ public final class CfbCipherMode extends AbstractCipherMode {
             for (int j = 0; j < cipherBlock.length; j++) {
                 plaintext[i * blockSize + j] = (byte) (encryptedFeedback[j] ^ cipherBlock[j]);
             }
+
+            prevBlock = cipherBlock;
         }
 
         return plaintext;
