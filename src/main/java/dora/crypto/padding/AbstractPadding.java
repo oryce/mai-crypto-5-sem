@@ -27,7 +27,8 @@ public abstract class AbstractPadding implements Padding {
         int paddingSize = paddingSize(data, blockSize);
 
         if (paddingSize > blockSize) {
-            throw new IllegalArgumentException("Data is not properly padded");
+            throw new IllegalArgumentException(
+                "Data is not properly padded. Such issues can arise if the decryption failed.");
         }
 
         return Arrays.copyOfRange(data, 0, data.length - paddingSize);

@@ -12,8 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Supplier;
 
@@ -24,8 +23,8 @@ import static java.util.Objects.requireNonNullElseGet;
 public final class SymmetricCipher {
 
     private final SymmetricCipherContext context;
-    private final Parameters parameters;
     private final byte[] key;
+    private final Parameters parameters;
 
     public SymmetricCipher(
         @NotNull BlockCipher cipher,
@@ -33,7 +32,7 @@ public final class SymmetricCipher {
         @NotNull PaddingType padding,
         byte @NotNull [] key,
         byte @Nullable [] iv,
-        @Nullable List<?> args,
+        @Nullable List<Object> args,
         @Nullable ForkJoinPool pool
     ) {
         this.context = new SymmetricCipherContext(
@@ -43,11 +42,11 @@ public final class SymmetricCipher {
             ),
             padding.createPadding()
         );
+        this.key = requireNonNull(key, "key");
         this.parameters = cipherMode.createParameters(
             requireNonNullElse(iv, new byte[0]),
             requireNonNullElseGet(args, Collections::emptyList)
         );
-        this.key = requireNonNull(key, "key");
     }
 
     public byte[] encrypt(byte[] data) throws InterruptedException {
@@ -130,7 +129,7 @@ public final class SymmetricCipher {
 
             static ParameterCreator ctr() {
                 return (iv, args) -> new CtrParameters(
-                     /* nonce   */ iv,
+                    /* nonce   */ iv,
                     /* counter */ requireNonNullElse(argumentAt(args, 0), 0)
                 );
             }
@@ -153,7 +152,7 @@ public final class SymmetricCipher {
 
     public enum PaddingType {
 
-        ANSI_X293(AnsiX923Padding::new),
+        ANSI_X923(AnsiX923Padding::new),
         ISO_10126(Iso10126Padding::new),
         PKCS7(Pkcs7Padding::new),
         ZEROS(ZerosPadding::new);
@@ -168,4 +167,78 @@ public final class SymmetricCipher {
             return creator.get();
         }
     }
+
+    //region Builder
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+
+        private BlockCipher blockCipher;
+        private CipherModeType cipherMode;
+        private PaddingType padding;
+        private byte[] key;
+        private byte[] iv;
+        private List<Object> args = new ArrayList<>();
+        private ForkJoinPool pool;
+
+        public Builder cipher(BlockCipher blockCipher) {
+            this.blockCipher = blockCipher;
+            return this;
+        }
+
+        public Builder mode(CipherModeType cipherMode) {
+            this.cipherMode = cipherMode;
+            return this;
+        }
+
+        public Builder padding(PaddingType padding) {
+            this.padding = padding;
+            return this;
+        }
+
+        public Builder key(byte[] key) {
+            this.key = key;
+            return this;
+        }
+
+        public Builder iv(byte[] iv) {
+            this.iv = iv;
+            return this;
+        }
+
+        public Builder arguments(List<Object> args) {
+            this.args = args;
+            return this;
+        }
+
+        public Builder arguments(Object... args) {
+            this.args = Arrays.asList(args);
+            return this;
+        }
+
+        public <T> Builder argument(T arg) {
+            this.args.add(arg);
+            return this;
+        }
+
+        public Builder pool(ForkJoinPool pool) {
+            this.pool = pool;
+            return this;
+        }
+
+        public SymmetricCipher build() {
+            return new SymmetricCipher(
+                blockCipher,
+                cipherMode,
+                padding,
+                key,
+                iv,
+                args,
+                pool
+            );
+        }
+    }
+    //endregion
 }

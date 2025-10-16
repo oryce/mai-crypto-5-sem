@@ -24,7 +24,7 @@ final class ParallelBlockProcessor {
         if (tasks == 1) {
             return function.apply(0, blocks);
         } else {
-            ForkJoinTask<List<T>> task = pool.submit(() ->
+            Future<List<T>> task = pool.submit(() ->
                 IntStream.range(0, tasks)
                     .parallel()
                     .mapToObj((taskIdx) -> {
