@@ -2,6 +2,9 @@ package dora.crypto.block.des;
 
 import dora.crypto.Permutations;
 import dora.crypto.block.FeistelBlockCipher;
+import org.jetbrains.annotations.NotNull;
+
+import static java.util.Objects.requireNonNull;
 
 public final class DesBlockCipher extends FeistelBlockCipher {
 
@@ -42,15 +45,19 @@ public final class DesBlockCipher extends FeistelBlockCipher {
     }
 
     @Override
-    public byte[] encrypt(byte[] block) {
-        byte[] permuted = Permutations.permute(block, IP, false, true);
+    public byte[] encrypt(byte @NotNull [] plaintext) {
+        requireNonNull(plaintext, "plaintext");
+
+        byte[] permuted = Permutations.permute(plaintext, IP, false, true);
         byte[] encrypted = super.encrypt(permuted);
         return Permutations.permute(encrypted, FP, false, true);
     }
 
     @Override
-    public byte[] decrypt(byte[] block) {
-        byte[] permuted = Permutations.permute(block, IP, false, true);
+    public byte[] decrypt(byte @NotNull [] ciphertext) {
+        requireNonNull(ciphertext, "ciphertext");
+
+        byte[] permuted = Permutations.permute(ciphertext, IP, false, true);
         byte[] decrypted = super.decrypt(permuted);
         return Permutations.permute(decrypted, FP, false, true);
     }

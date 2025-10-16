@@ -32,12 +32,14 @@ public class FeistelBlockCipher implements BlockCipher {
     }
 
     @Override
-    public void init(byte[] key) {
-        roundKeys = keySchedule.roundKeys(key);
+    public void init(byte @NotNull [] key) {
+        roundKeys = keySchedule.roundKeys(requireNonNull(key, "key"));
     }
 
     @Override
-    public byte[] encrypt(byte[] plaintext) {
+    public byte[] encrypt(byte @NotNull [] plaintext) {
+        requireNonNull(plaintext, "plaintext");
+
         if (roundKeys == null)
             throw new IllegalStateException("Cipher is not initialized");
         if (plaintext.length != blockSize)
@@ -71,7 +73,9 @@ public class FeistelBlockCipher implements BlockCipher {
     }
 
     @Override
-    public byte[] decrypt(byte[] ciphertext) {
+    public byte[] decrypt(byte @NotNull [] ciphertext) {
+        requireNonNull(ciphertext, "ciphertext");
+
         if (roundKeys == null)
             throw new IllegalStateException("Cipher is not initialized");
         if (ciphertext.length != blockSize)

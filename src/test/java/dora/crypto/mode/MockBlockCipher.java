@@ -1,6 +1,7 @@
 package dora.crypto.mode;
 
 import dora.crypto.block.BlockCipher;
+import org.jetbrains.annotations.NotNull;
 
 public final class MockBlockCipher implements BlockCipher {
 
@@ -17,23 +18,23 @@ public final class MockBlockCipher implements BlockCipher {
     }
 
     @Override
-    public void init(byte[] key) {
+    public void init(byte @NotNull [] key) {
         this.key = key.clone();
     }
 
     @Override
-    public byte[] encrypt(byte[] block) {
-        byte[] result = new byte[block.length];
+    public byte[] encrypt(byte @NotNull [] plaintext) {
+        byte[] result = new byte[plaintext.length];
 
-        for (int i = 0; i < block.length; i++) {
-            result[i] = (byte) (block[i] ^ key[i % key.length]);
+        for (int i = 0; i < plaintext.length; i++) {
+            result[i] = (byte) (plaintext[i] ^ key[i % key.length]);
         }
 
         return result;
     }
 
     @Override
-    public byte[] decrypt(byte[] block) {
-        return encrypt(block);
+    public byte[] decrypt(byte @NotNull [] ciphertext) {
+        return encrypt(ciphertext);
     }
 }

@@ -2,6 +2,9 @@ package dora.crypto.block.des;
 
 import dora.crypto.Permutations;
 import dora.crypto.block.KeySchedule;
+import org.jetbrains.annotations.NotNull;
+
+import static java.util.Objects.requireNonNull;
 
 public final class DesKeySchedule implements KeySchedule {
 
@@ -41,7 +44,9 @@ public final class DesKeySchedule implements KeySchedule {
     };
 
     @Override
-    public byte[][] roundKeys(byte[] key) {
+    public byte[][] roundKeys(byte @NotNull [] key) {
+        requireNonNull(key, "key");
+
         if (key.length != 8)
             throw new IllegalArgumentException("Expected a 64-bit key");
 

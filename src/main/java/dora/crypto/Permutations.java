@@ -1,5 +1,9 @@
 package dora.crypto;
 
+import org.jetbrains.annotations.NotNull;
+
+import static java.util.Objects.requireNonNull;
+
 public final class Permutations {
 
     private Permutations() {
@@ -20,11 +24,14 @@ public final class Permutations {
      * @param oneIndexed   whether the bits are one-indexed
      */
     public static byte[] permute(
-        byte[] input,
-        int[] pBox,
+        byte @NotNull [] input,
+        int @NotNull [] pBox,
         boolean reverseOrder,
         boolean oneIndexed
     ) {
+        requireNonNull(input, "input");
+        requireNonNull(pBox, "pBox");
+
         int inputBits = input.length * Byte.SIZE;
         int outputBytes = Math.ceilDiv(pBox.length, 8); // round up
 

@@ -1,6 +1,7 @@
 package dora.crypto.mode;
 
 import dora.crypto.block.BlockCipher;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Cipher mode wraps a {@link BlockCipher} and operates on padded data to
@@ -26,15 +27,15 @@ public interface CipherMode {
     /**
      * Initializes the cipher mode.
      */
-    void init(byte[] key, Parameters parameters);
+    void init(byte @NotNull [] key, Parameters parameters);
 
     /**
      * Encrypts padded data with the provided key.
      */
-    byte[] encrypt(byte[] plaintext) throws InterruptedException;
+    byte[] encrypt(byte @NotNull [] plaintext) throws InterruptedException;
 
     /**
      * Decrypts padded data with the provided key.
      */
-    byte[] decrypt(byte[] ciphertext) throws InterruptedException;
+    byte[] decrypt(byte @NotNull [] ciphertext) throws InterruptedException;
 }

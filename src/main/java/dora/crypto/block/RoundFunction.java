@@ -1,6 +1,8 @@
 package dora.crypto.block;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface RoundFunction {
 
-    byte[] apply(byte[] block, byte[] key);
+    byte[] apply(byte @NotNull [] block, byte @NotNull [] key);
 }

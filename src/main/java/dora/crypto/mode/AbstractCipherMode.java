@@ -1,6 +1,9 @@
 package dora.crypto.mode;
 
 import dora.crypto.block.BlockCipher;
+import org.jetbrains.annotations.NotNull;
+
+import static java.util.Objects.requireNonNull;
 
 abstract class AbstractCipherMode implements CipherMode {
 
@@ -18,17 +21,20 @@ abstract class AbstractCipherMode implements CipherMode {
     }
 
     @Override
-    public void init(byte[] key, Parameters parameters) {
-        cipher.init(key);
+    public void init(byte @NotNull [] key, Parameters parameters) {
+        cipher.init(requireNonNull(key, "key"));
         initMode(parameters);
     }
 
     protected abstract void initMode(Parameters parameters);
 
     @Override
-    public byte[] encrypt(byte[] plaintext) throws InterruptedException {
+    public byte[] encrypt(byte @NotNull [] plaintext) throws InterruptedException {
+        requireNonNull(plaintext, "plaintext");
+
         if (plaintext.length % blockSize != 0)
             throw new IllegalArgumentException("Plaintext not multiple of block size");
+
         return encryptBlocks(plaintext);
     }
 
@@ -36,9 +42,12 @@ abstract class AbstractCipherMode implements CipherMode {
     throws InterruptedException;
 
     @Override
-    public byte[] decrypt(byte[] ciphertext) throws InterruptedException {
+    public byte[] decrypt(byte @NotNull [] ciphertext) throws InterruptedException {
+        requireNonNull(ciphertext, "ciphertext");
+
         if (ciphertext.length % blockSize != 0)
             throw new IllegalArgumentException("Ciphertext not multiple of block size");
+
         return decryptBlocks(ciphertext);
     }
 

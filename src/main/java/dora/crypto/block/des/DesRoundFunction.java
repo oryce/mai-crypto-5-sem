@@ -2,6 +2,9 @@ package dora.crypto.block.des;
 
 import dora.crypto.Permutations;
 import dora.crypto.block.RoundFunction;
+import org.jetbrains.annotations.NotNull;
+
+import static java.util.Objects.requireNonNull;
 
 public final class DesRoundFunction implements RoundFunction {
 
@@ -84,7 +87,10 @@ public final class DesRoundFunction implements RoundFunction {
     };
 
     @Override
-    public byte[] apply(byte[] block, byte[] key) {
+    public byte[] apply(byte @NotNull [] block, byte @NotNull [] key) {
+        requireNonNull(block, "block");
+        requireNonNull(key, "key");
+
         if (block.length != 4)
             throw new IllegalArgumentException("Invalid round block size");
         if (key.length != 6)

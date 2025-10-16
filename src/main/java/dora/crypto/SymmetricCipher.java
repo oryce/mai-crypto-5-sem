@@ -49,13 +49,16 @@ public final class SymmetricCipher {
         );
     }
 
-    public byte[] encrypt(byte[] data) throws InterruptedException {
+    public byte[] encrypt(byte @NotNull [] data) throws InterruptedException {
         context.init(key, parameters);
         return context.encrypt(data);
     }
 
-    public void encryptFile(Path input, Path output)
+    public void encryptFile(@NotNull Path input, @NotNull Path output)
     throws IOException, InterruptedException {
+        requireNonNull(input, "input file");
+        requireNonNull(output, "output file");
+
         context.init(key, parameters);
 
         try (var fis = Files.newInputStream(input);
@@ -64,13 +67,16 @@ public final class SymmetricCipher {
         }
     }
 
-    public byte[] decrypt(byte[] data) throws InterruptedException {
+    public byte[] decrypt(byte @NotNull [] data) throws InterruptedException {
         context.init(key, parameters);
         return context.decrypt(data);
     }
 
-    public void decryptFile(Path input, Path output)
+    public void decryptFile(@NotNull Path input, @NotNull Path output)
     throws IOException, InterruptedException {
+        requireNonNull(input, "input file");
+        requireNonNull(output, "output file");
+
         context.init(key, parameters);
 
         try (var fis = Files.newInputStream(input);
