@@ -64,7 +64,8 @@ public final class SymmetricCipherContext {
 
         int blockSize = cipherMode.blockSize();
 
-        byte[] buffer = new byte[blockSize * 1024];
+        // Read large amounts of data to take advantage of parallel processing.
+        byte[] buffer = new byte[524288];
         byte[] remainder = new byte[blockSize];
         int remainderLen = 0;
 

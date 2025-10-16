@@ -6,7 +6,7 @@ import java.util.stream.IntStream;
 
 final class ParallelBlockProcessor {
 
-    private static final int BLOCKS_PER_TASK = 64;
+    private static final int BLOCKS_PER_TASK = 4096;
 
     private ParallelBlockProcessor() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
