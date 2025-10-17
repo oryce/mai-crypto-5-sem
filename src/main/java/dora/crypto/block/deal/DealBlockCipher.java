@@ -13,7 +13,7 @@ public final class DealBlockCipher extends FeistelBlockCipher {
     public DealBlockCipher(byte @NotNull [] desKey) {
         super(
             new DealKeySchedule(desKey),
-            new DealRoundFunction(desKey),
+            new DealRoundFunction(),
             16
         );
     }
