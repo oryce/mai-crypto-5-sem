@@ -2,8 +2,10 @@ package dora.crypto;
 
 import dora.crypto.SymmetricCipher.CipherModeType;
 import dora.crypto.SymmetricCipher.PaddingType;
+import dora.crypto.block.deal.DealBlockCipher;
 import dora.crypto.block.des.DesBlockCipher;
-import net.jqwik.api.*;
+import net.jqwik.api.Example;
+import net.jqwik.api.ForAll;
 import net.jqwik.api.constraints.Positive;
 import net.jqwik.api.constraints.Size;
 
@@ -124,6 +126,128 @@ public class SymmetricCipherTest {
                 .cipher(new DesBlockCipher())
                 .mode(CipherModeType.RANDOM_DELTA)
                 .padding(PaddingType.ISO_10126)
+                .key(key)
+                .iv(nonce)
+                .arguments(counter, seed)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_DEAL_CBC_AnsiX923Padding(
+        @ForAll @Size(value = 16) byte[] key,
+        @ForAll @Size(value = 16) byte[] iv,
+        @ForAll @Size(value = 8) byte[] desKey
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new DealBlockCipher(desKey))
+                .mode(CipherModeType.CBC)
+                .padding(PaddingType.ANSI_X923)
+                .key(key)
+                .iv(iv)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_DEAL_CFB_Iso10126Padding(
+        @ForAll @Size(value = 16) byte[] key,
+        @ForAll @Size(value = 16) byte[] iv,
+        @ForAll @Size(value = 8) byte[] desKey
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new DealBlockCipher(desKey))
+                .mode(CipherModeType.CFB)
+                .padding(PaddingType.ISO_10126)
+                .key(key)
+                .iv(iv)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_DEAL_CTR_Pkcs7Padding(
+        @ForAll @Size(value = 16) byte[] key,
+        @ForAll @Size(value = 8) byte[] nonce,
+        @ForAll @Positive int counter,
+        @ForAll @Size(value = 8) byte[] desKey
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new DealBlockCipher(desKey))
+                .mode(CipherModeType.CTR)
+                .padding(PaddingType.ISO_10126)
+                .key(key)
+                .iv(nonce)
+                .argument(counter)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_DEAL_ECB_AnsiX923Padding(
+        @ForAll @Size(value = 16) byte[] key,
+        @ForAll @Size(value = 8) byte[] desKey
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new DealBlockCipher(desKey))
+                .mode(CipherModeType.ECB)
+                .padding(PaddingType.ANSI_X923)
+                .key(key)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_DEAL_OFB_Iso10126Padding(
+        @ForAll @Size(value = 16) byte[] key,
+        @ForAll @Size(value = 16) byte[] iv,
+        @ForAll @Size(value = 8) byte[] desKey
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new DealBlockCipher(desKey))
+                .mode(CipherModeType.OFB)
+                .padding(PaddingType.ISO_10126)
+                .key(key)
+                .iv(iv)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_DEAL_PCBC_Pkcs7Padding(
+        @ForAll @Size(value = 16) byte[] key,
+        @ForAll @Size(value = 16) byte[] iv,
+        @ForAll @Size(value = 8) byte[] desKey
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new DealBlockCipher(desKey))
+                .mode(CipherModeType.PCBC)
+                .padding(PaddingType.PKCS7)
+                .key(key)
+                .iv(iv)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_DEAL_RandomDelta_AnsiX923Padding(
+        @ForAll @Size(value = 16) byte[] key,
+        @ForAll @Size(value = 8) byte[] nonce,
+        @ForAll @Positive int counter,
+        @ForAll long seed,
+        @ForAll @Size(value = 8) byte[] desKey
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new DealBlockCipher(desKey))
+                .mode(CipherModeType.RANDOM_DELTA)
+                .padding(PaddingType.ANSI_X923)
                 .key(key)
                 .iv(nonce)
                 .arguments(counter, seed)
