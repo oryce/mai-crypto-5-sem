@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * DEAL support 128-bit, 192-bit and 256-bit keys. 128-bit and 192-bit
- * keys provide 6 rounds of encryption, while 256-bit keys provide 8.
+ * keys provide 6 rounds of encryption, 256-bit keys provide 8.
  */
 public final class DealKeySchedule implements KeySchedule {
 
@@ -55,14 +55,15 @@ public final class DealKeySchedule implements KeySchedule {
             roundKeys[i] = des.encrypt(xor(keyParts[i], roundKeys[i - 1]));
         }
 
-        for (int i = parts; i < rounds; i++) {
-            // Use wrapping powers of two for the counter block.
-            long counter = 1L << ((i - parts) & 63);
+        for (int k = parts; k < rounds; k++) {
+            // Use wrapping powers of two for the constant block.
+            byte[] constant = toByteArray(1L << (k - parts));
 
-            roundKeys[i] = xor(
-                keyParts[i % parts],
-                xor(roundKeys[i - 1], toByteArray(counter))
-            );
+            for (int i = 0; i < 8; i++) {
+                roundKeys[k][i] = (byte) (keyParts[k % parts][i]
+                                              ^ roundKeys[k - 1][i]
+                                              ^ constant[i]);
+            }
         }
 
         return roundKeys;
