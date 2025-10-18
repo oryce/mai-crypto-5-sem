@@ -9,14 +9,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class DealRoundFunction implements RoundFunction {
 
-    private final DesBlockCipher des;
-
-    public DealRoundFunction() {
-        des = new DesBlockCipher();
-    }
-
     @Override
     public byte[] apply(byte @NotNull [] block, byte @NotNull [] key) {
+        DesBlockCipher des = new DesBlockCipher();
         des.init(key);
         return des.encrypt(block);
     }
