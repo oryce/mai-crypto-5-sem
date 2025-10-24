@@ -1,12 +1,13 @@
 package dora.crypto.block.des;
 
 import dora.crypto.block.KeySchedule;
-import net.jqwik.api.Example;
+import net.jqwik.api.*;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class DesKeyScheduleTest {
 
@@ -14,6 +15,14 @@ public class DesKeyScheduleTest {
 
     DesKeyScheduleTest() {
         keySchedule = new DesKeySchedule();
+    }
+
+    @Property(tries = 100)
+    void invalidKeySizeThrowsException(@ForAll byte[] key) {
+        Assume.that(key.length != 8);
+
+        assertThatThrownBy(() -> keySchedule.roundKeys(key))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Example
