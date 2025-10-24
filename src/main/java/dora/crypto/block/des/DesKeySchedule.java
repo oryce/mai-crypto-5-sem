@@ -1,6 +1,5 @@
 package dora.crypto.block.des;
 
-import dora.crypto.Permutations;
 import dora.crypto.block.KeySchedule;
 import org.jetbrains.annotations.NotNull;
 

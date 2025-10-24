@@ -1,8 +1,8 @@
 package dora.crypto;
 
-import dora.crypto.mode.CipherMode;
-import dora.crypto.mode.Parameters;
-import dora.crypto.padding.Padding;
+import dora.crypto.block.mode.CipherMode;
+import dora.crypto.block.mode.Parameters;
+import dora.crypto.block.padding.Padding;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;

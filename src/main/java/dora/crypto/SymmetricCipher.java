@@ -1,11 +1,11 @@
 package dora.crypto;
 
 import dora.crypto.block.BlockCipher;
-import dora.crypto.mode.*;
-import dora.crypto.mode.CtrCipherMode.CtrParameters;
-import dora.crypto.mode.Parameters.IvParameters;
-import dora.crypto.mode.RandomDeltaCipherMode.RandomDeltaParameters;
-import dora.crypto.padding.*;
+import dora.crypto.block.mode.*;
+import dora.crypto.block.mode.CtrCipherMode.CtrParameters;
+import dora.crypto.block.mode.Parameters.IvParameters;
+import dora.crypto.block.mode.RandomDeltaCipherMode.RandomDeltaParameters;
+import dora.crypto.block.padding.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
