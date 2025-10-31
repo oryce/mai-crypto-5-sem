@@ -30,9 +30,9 @@ public class RijndaelInverseSBoxTest {
         RijndaelInverseSBox sBox = new RijndaelInverseSBox((short) 0x11b);
 
         for (int i = 0; i < 256; i++) {
-            assertThat((byte) AES_INVERSE_S_BOX[i])
-                .describedAs("AES[%d] should be equal to sBox[%d]", i, i)
-                .isEqualTo(sBox.lookup((byte) i));
+            assertThat(sBox.lookup((byte) i))
+                .describedAs("S[%d] should equal AES[%d]", i, i)
+                .isEqualTo((byte) AES_INVERSE_S_BOX[i]);
         }
     }
 }
