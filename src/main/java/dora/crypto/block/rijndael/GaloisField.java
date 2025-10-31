@@ -23,12 +23,20 @@ public final class GaloisField {
     }
 
     /**
-     * Multiplies two polynomials in GF(2^8) modulo <code>mod</code>.
+     * Multiplies two polynomials in GF(2^8) irreducible modulo <code>mod</code>.
      */
     public byte mulMod(byte a, byte b, short mod) {
         if (!irreducible(mod))
             throw new IllegalArgumentException("Modulus may not be reducible");
+        return mulModUnchecked(a, b, mod);
+    }
 
+    /**
+     * Multiplies two polynomials in GF(2^8) irreducible modulo <code>mod</code>.
+     *
+     * <p>The modulus is not checked for irreducibility.
+     */
+    byte mulModUnchecked(byte a, byte b, short mod) {
         return (byte) mulMod(
             Byte.toUnsignedLong(a),
             Byte.toUnsignedLong(b),
@@ -37,12 +45,26 @@ public final class GaloisField {
     }
 
     /**
-     * Returns the multiplicative inverse of a polynomial in GF(2^8) modulo <code>mod</code>.
+     * Returns the multiplicative inverse of a polynomial in GF(2^8) irreducible modulo
+     * <code>mod</code>.
      */
     public byte inv(byte f, short mod) {
         if (!irreducible(mod))
             throw new IllegalArgumentException("Modulus may not be reducible");
 
+        return (byte) inv(
+            Byte.toUnsignedLong(f),
+            Short.toUnsignedLong(mod)
+        );
+    }
+
+    /**
+     * Returns the multiplicative inverse of a polynomial in GF(2^8) irreducible modulo
+     * <code>mod</code>.
+     *
+     * <p>The modulus is not checked for irreducibility.
+     */
+    byte invUnchecked(byte f, short mod) {
         return (byte) inv(
             Byte.toUnsignedLong(f),
             Short.toUnsignedLong(mod)
