@@ -23,7 +23,7 @@ public final class GaloisField {
     }
 
     /**
-     * Multiplies two polynomials in GF(2^8) modulo <code>mod</code>.
+     * Multiplies two polynomials in GF(2^8) irreducible modulo <code>mod</code>.
      */
     public byte mulMod(byte a, byte b, short mod) {
         if (!irreducible(mod))
@@ -32,7 +32,9 @@ public final class GaloisField {
     }
 
     /**
-     * Multiplies two polynomials in GF(2^8) modulo <code>mod</code> (irreducible).
+     * Multiplies two polynomials in GF(2^8) irreducible modulo <code>mod</code>.
+     *
+     * <p>The modulus is not checked for irreducibility.
      */
     byte mulModUnchecked(byte a, byte b, short mod) {
         return (byte) mulMod(
@@ -43,7 +45,8 @@ public final class GaloisField {
     }
 
     /**
-     * Returns the multiplicative inverse of a polynomial in GF(2^8) modulo <code>mod</code>.
+     * Returns the multiplicative inverse of a polynomial in GF(2^8) irreducible modulo
+     * <code>mod</code>.
      */
     public byte inv(byte f, short mod) {
         if (!irreducible(mod))
@@ -56,8 +59,10 @@ public final class GaloisField {
     }
 
     /**
-     * Returns the multiplicative inverse of a polynomial in GF(2^8) modulo <code>mod</code>
-     * (irreducible).
+     * Returns the multiplicative inverse of a polynomial in GF(2^8) irreducible modulo
+     * <code>mod</code>.
+     *
+     * <p>The modulus is not checked for irreducibility.
      */
     byte invUnchecked(byte f, short mod) {
         return (byte) inv(

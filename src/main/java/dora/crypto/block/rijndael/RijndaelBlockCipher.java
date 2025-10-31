@@ -176,6 +176,7 @@ public final class RijndaelBlockCipher implements BlockCipher {
         byte[] result = new byte[state.length];
         GaloisField field = new GaloisField();
 
+        // Inverse of the normal transformation matrix in GF(2^8).
         final byte[] transformation = new byte[] {
             0xe, 0xb, 0xd, 0x9,
             0x9, 0xe, 0xb, 0xd,
