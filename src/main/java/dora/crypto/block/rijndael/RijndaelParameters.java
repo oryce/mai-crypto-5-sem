@@ -11,6 +11,7 @@ public final class RijndaelParameters {
 
     private final KeySize keySize;
     private final BlockSize blockSize;
+    private final short modulus;
     private final RijndaelSBox sBox;
     private final RijndaelInverseSBox inverseSBox;
     private final RijndaelRcon rcon;
@@ -20,8 +21,13 @@ public final class RijndaelParameters {
         @NotNull BlockSize blockSize,
         short modulus
     ) {
+        GaloisField field = new GaloisField();
+        if (!field.irreducible(modulus))
+            throw new IllegalArgumentException("Modulus may not be reducible");
+
         this.keySize = Objects.requireNonNull(keySize, "key size");
         this.blockSize = Objects.requireNonNull(blockSize, "block size");
+        this.modulus = modulus;
         this.sBox = new RijndaelSBox(modulus);
         this.inverseSBox = new RijndaelInverseSBox(modulus);
         this.rcon = new RijndaelRcon(modulus, keySize.words(), blockSize.words(), rounds());
@@ -52,6 +58,10 @@ public final class RijndaelParameters {
 
     public BlockSize blockSize() {
         return blockSize;
+    }
+
+    public short modulus() {
+        return modulus;
     }
 
     public RijndaelSBox sBox() {

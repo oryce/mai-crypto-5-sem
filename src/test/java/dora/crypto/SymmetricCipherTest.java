@@ -4,8 +4,10 @@ import dora.crypto.SymmetricCipher.CipherModeType;
 import dora.crypto.SymmetricCipher.PaddingType;
 import dora.crypto.block.deal.DealBlockCipher;
 import dora.crypto.block.des.DesBlockCipher;
-import net.jqwik.api.Example;
-import net.jqwik.api.ForAll;
+import dora.crypto.block.rijndael.*;
+import dora.crypto.block.rijndael.RijndaelParameters.BlockSize;
+import dora.crypto.block.rijndael.RijndaelParameters.KeySize;
+import net.jqwik.api.*;
 import net.jqwik.api.constraints.Positive;
 import net.jqwik.api.constraints.Size;
 
@@ -18,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class SymmetricCipherTest {
 
+    //region DES
     @Example
     void decryptFile_DES_CBC_AnsiX923Padding(
         @ForAll @Size(value = 8) byte[] key,
@@ -132,7 +135,9 @@ public class SymmetricCipherTest {
                 .build()
         );
     }
+    //endregion
 
+    //region DEAL
     @Example
     void decryptFile_DEAL_CBC_AnsiX923Padding(
         @ForAll @Size(value = 16) byte[] key,
@@ -254,6 +259,151 @@ public class SymmetricCipherTest {
                 .build()
         );
     }
+    //endregion
+
+    //region Rijndael
+    @Example
+    void decryptFile_Rijndael_K128_B128_CBC_AnsiX923Padding(
+        @ForAll @Size(value = 16) byte[] key,
+        @ForAll @Size(value = 16) byte[] iv,
+        @ForAll("irreducibleModulus") short modulus
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new RijndaelBlockCipher(
+                    new RijndaelParameters(KeySize.KEY_128, BlockSize.BLOCK_128, modulus)
+                ))
+                .mode(CipherModeType.CBC)
+                .padding(PaddingType.ANSI_X923)
+                .key(key)
+                .iv(iv)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_Rijndael_K128_B192_CFB_Iso10126Padding(
+        @ForAll @Size(value = 16) byte[] key,
+        @ForAll @Size(value = 24) byte[] iv,
+        @ForAll("irreducibleModulus") short modulus
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new RijndaelBlockCipher(
+                    new RijndaelParameters(KeySize.KEY_128, BlockSize.BLOCK_192, modulus)
+                ))
+                .mode(CipherModeType.CFB)
+                .padding(PaddingType.ISO_10126)
+                .key(key)
+                .iv(iv)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_Rijndael_K128_B256_CTR_Pkcs7Padding(
+        @ForAll @Size(value = 16) byte[] key,
+        @ForAll @Size(value = 16) byte[] nonce,
+        @ForAll @Positive int counter,
+        @ForAll("irreducibleModulus") short modulus
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new RijndaelBlockCipher(
+                    new RijndaelParameters(KeySize.KEY_128, BlockSize.BLOCK_256, modulus)
+                ))
+                .mode(CipherModeType.CTR)
+                .padding(PaddingType.PKCS7)
+                .key(key)
+                .iv(nonce)
+                .argument(counter)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_Rijndael_K192_B128_ECB_AnsiX923Padding(
+        @ForAll @Size(value = 24) byte[] key,
+        @ForAll("irreducibleModulus") short modulus
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new RijndaelBlockCipher(
+                    new RijndaelParameters(KeySize.KEY_192, BlockSize.BLOCK_128, modulus)
+                ))
+                .mode(CipherModeType.ECB)
+                .padding(PaddingType.ANSI_X923)
+                .key(key)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_Rijndael_K192_B192_OFB_Iso10126Padding(
+        @ForAll @Size(value = 24) byte[] key,
+        @ForAll @Size(value = 24) byte[] iv,
+        @ForAll("irreducibleModulus") short modulus
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new RijndaelBlockCipher(
+                    new RijndaelParameters(KeySize.KEY_192, BlockSize.BLOCK_192, modulus)
+                ))
+                .mode(CipherModeType.OFB)
+                .padding(PaddingType.ISO_10126)
+                .key(key)
+                .iv(iv)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_Rijndael_K192_B256_PCBC_Pkcs7Padding(
+        @ForAll @Size(value = 24) byte[] key,
+        @ForAll @Size(value = 32) byte[] iv,
+        @ForAll("irreducibleModulus") short modulus
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new RijndaelBlockCipher(
+                    new RijndaelParameters(KeySize.KEY_192, BlockSize.BLOCK_256, modulus)
+                ))
+                .mode(CipherModeType.PCBC)
+                .padding(PaddingType.PKCS7)
+                .key(key)
+                .iv(iv)
+                .build()
+        );
+    }
+
+    @Example
+    void decryptFile_Rijndael_K256_B128_RandomDelta_AnsiX923Padding(
+        @ForAll @Size(value = 32) byte[] key,
+        @ForAll @Size(value = 8) byte[] iv,
+        @ForAll @Positive int counter,
+        @ForAll long seed,
+        @ForAll("irreducibleModulus") short modulus
+    ) throws IOException, InterruptedException {
+        decryptFileTests(
+            SymmetricCipher.builder()
+                .cipher(new RijndaelBlockCipher(
+                    new RijndaelParameters(KeySize.KEY_256, BlockSize.BLOCK_128, modulus)
+                ))
+                .mode(CipherModeType.RANDOM_DELTA)
+                .padding(PaddingType.ANSI_X923)
+                .key(key)
+                .iv(iv)
+                .arguments(counter, seed)
+                .build()
+        );
+    }
+
+    @Provide("irreducibleModulus")
+    Arbitrary<Short> irreducibleModulus() {
+        GaloisField field = new GaloisField();
+        return Arbitraries.of(field.irreducibles());
+    }
+    //endregion
 
     private void decryptFileTests(SymmetricCipher cipher)
     throws IOException, InterruptedException {

@@ -4,12 +4,13 @@ public final class RijndaelSBox {
 
     private final byte[] sBox = new byte[256];
 
-    public RijndaelSBox(short modulus) {
+    /**
+     * Initializes the Rijndael S-Box.
+     *
+     * @param modulus irreducible modulus in GF(2^8).
+     */
+    RijndaelSBox(short modulus) {
         GaloisField field = new GaloisField();
-
-        if (!field.irreducible(modulus))
-            throw new IllegalArgumentException("Modulus may not be reducible");
-
         init(field, modulus);
     }
 
@@ -19,7 +20,7 @@ public final class RijndaelSBox {
 
     private void init(GaloisField field, short modulus) {
         for (int a = 0; a < sBox.length; a++) {
-            byte b = a == 0 ? 0 : field.inv((byte) a, modulus);
+            byte b = a == 0 ? 0 : field.invUnchecked((byte) a, modulus);
             sBox[a] = (byte) (b ^ rotateLeft(b, 1)
                                   ^ rotateLeft(b, 2)
                                   ^ rotateLeft(b, 3)

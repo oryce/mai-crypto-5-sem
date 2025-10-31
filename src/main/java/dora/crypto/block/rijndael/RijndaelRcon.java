@@ -16,13 +16,10 @@ public final class RijndaelRcon {
      * @param blockWords length of the block in 32-bit words
      * @param rounds     amount of rounds
      */
-    public RijndaelRcon(short modulus, int keyWords, int blockWords, int rounds) {
-        GaloisField field = new GaloisField();
-
-        if (!field.irreducible(modulus))
-            throw new IllegalArgumentException("Modulus may not be reducible");
-
+    RijndaelRcon(short modulus, int keyWords, int blockWords, int rounds) {
         rcon = new byte[Math.ceilDiv(blockWords * (rounds + 1), keyWords)][4];
+
+        GaloisField field = new GaloisField();
         init(field, modulus);
     }
 
@@ -34,7 +31,7 @@ public final class RijndaelRcon {
         rcon[0][0] = 0b1;
 
         for (int i = 1; i < rcon.length; i++) {
-            rcon[i][0] = field.mulMod(rcon[i - 1][0], (byte) 0b10, modulus);
+            rcon[i][0] = field.mulModUnchecked(rcon[i - 1][0], (byte) 0b10, modulus);
         }
     }
 }

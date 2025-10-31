@@ -69,7 +69,10 @@ public final class RijndaelKeySchedule implements KeySchedule {
 
         for (int round = 0; round < roundKeys.length; round++) {
             for (int column = 0; column < b; column++) {
-                System.arraycopy(w[round * b + column], 0, roundKeys[round], column * 4, 4);
+                System.arraycopy(
+                    /* src */ w[round * b + column], 0,
+                    /* dst */ roundKeys[round], column * 4,
+                    /* len */ 4);
             }
         }
 
