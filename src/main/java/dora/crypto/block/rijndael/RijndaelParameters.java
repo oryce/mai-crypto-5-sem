@@ -7,10 +7,13 @@ import java.util.Objects;
 
 public final class RijndaelParameters {
 
+    private static final short AES_MODULUS = 0x11b;
+
     private final KeySize keySize;
     private final BlockSize blockSize;
     private final RijndaelSBox sBox;
     private final RijndaelInverseSBox inverseSBox;
+    private final RijndaelRcon rcon;
 
     public RijndaelParameters(
         @NotNull KeySize keySize,
@@ -21,10 +24,26 @@ public final class RijndaelParameters {
         this.blockSize = Objects.requireNonNull(blockSize, "block size");
         this.sBox = new RijndaelSBox(modulus);
         this.inverseSBox = new RijndaelInverseSBox(modulus);
+        this.rcon = new RijndaelRcon(modulus, keySize.words(), blockSize.words(), rounds());
     }
 
-    public int numRounds() {
-        return Math.max(keySize.numColumns(), blockSize.numColumns()) + 6;
+    //region Factory methods
+    public static RijndaelParameters aes128() {
+        return new RijndaelParameters(KeySize.KEY_128, BlockSize.BLOCK_128, AES_MODULUS);
+    }
+
+    public static RijndaelParameters aes192() {
+        return new RijndaelParameters(KeySize.KEY_192, BlockSize.BLOCK_128, AES_MODULUS);
+    }
+
+    public static RijndaelParameters aes256() {
+        return new RijndaelParameters(KeySize.KEY_256, BlockSize.BLOCK_128, AES_MODULUS);
+    }
+    //endregion
+
+    //region Getters
+    public int rounds() {
+        return Math.max(keySize.words(), blockSize.words()) + 6;
     }
 
     public KeySize keySize() {
@@ -43,55 +62,60 @@ public final class RijndaelParameters {
         return inverseSBox;
     }
 
+    public byte[][] rcon() {
+        return rcon.value();
+    }
+    //endregion
+
     public enum KeySize {
-        KEY_128(128),
-        KEY_192(192),
-        KEY_256(256);
+        KEY_128(16),
+        KEY_192(24),
+        KEY_256(32);
 
-        private final int value;
+        private final int bytes;
 
-        KeySize(int value) {
-            this.value = value;
+        KeySize(int bytes) {
+            this.bytes = bytes;
         }
 
-        public int value() {
-            return value;
+        public int bytes() {
+            return bytes;
         }
 
-        public int numColumns() {
-            return value / 4;
+        public int words() {
+            return bytes / 4;
         }
 
-        public static KeySize of(int value) {
+        public static KeySize ofBytes(int bytes) {
             return Arrays.stream(values())
-                .filter((size) -> size.value() == value)
+                .filter((size) -> size.bytes() == bytes)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid key size"));
         }
     }
 
     public enum BlockSize {
-        BLOCK_128(128),
-        BLOCK_192(192),
-        BLOCK_256(256);
+        BLOCK_128(16),
+        BLOCK_192(24),
+        BLOCK_256(32);
 
-        private final int value;
+        private final int bytes;
 
-        BlockSize(int value) {
-            this.value = value;
+        BlockSize(int bytes) {
+            this.bytes = bytes;
         }
 
-        public int value() {
-            return value;
+        public int bytes() {
+            return bytes;
         }
 
-        public int numColumns() {
-            return value / 4;
+        public int words() {
+            return bytes / 4;
         }
 
-        public static BlockSize of(int value) {
+        public static BlockSize ofBytes(int bytes) {
             return Arrays.stream(values())
-                .filter((size) -> size.value() == value)
+                .filter((size) -> size.bytes() == bytes)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid block size"));
         }
