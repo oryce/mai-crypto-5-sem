@@ -92,7 +92,7 @@ public final class SymmetricCipher {
         CTR(CtrCipherMode::new, ParameterCreator.ctr()),
         ECB(EcbCipherMode::new, ParameterCreator.none()),
         OFB((cipher, pool) -> new OfbCipherMode(cipher), ParameterCreator.iv()),
-        PCBC((cipher, pool) -> new PcbcCipherMode(cipher), ParameterCreator.iv()),
+        PCBC(PcbcCipherMode::new, ParameterCreator.iv()),
         RANDOM_DELTA(RandomDeltaCipherMode::new, ParameterCreator.randomDelta());
 
         private final InstanceCreator instanceCreator;

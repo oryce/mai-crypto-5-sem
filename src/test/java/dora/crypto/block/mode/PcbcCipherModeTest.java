@@ -5,12 +5,17 @@ import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.Size;
 
+import java.util.concurrent.ForkJoinPool;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PcbcCipherModeTest extends CipherModeTest {
 
     PcbcCipherModeTest() {
-        super(new PcbcCipherMode(new MockBlockCipher(16)));
+        super(new PcbcCipherMode(
+            new MockBlockCipher(16),
+            ForkJoinPool.commonPool()
+        ));
     }
 
     @Property(tries = 1000)

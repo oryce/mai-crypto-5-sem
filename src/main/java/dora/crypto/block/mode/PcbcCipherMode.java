@@ -4,13 +4,19 @@ import dora.crypto.block.BlockCipher;
 import dora.crypto.block.mode.Parameters.IvParameters;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 public final class PcbcCipherMode extends AbstractCipherMode {
 
+    private final ForkJoinPool pool;
+
     private byte[] prevBlock;
 
-    public PcbcCipherMode(BlockCipher cipher) {
+    public PcbcCipherMode(BlockCipher cipher, ForkJoinPool pool) {
         super(cipher);
+
+        this.pool = pool;
     }
 
     @Override
@@ -44,14 +50,24 @@ public final class PcbcCipherMode extends AbstractCipherMode {
     }
 
     @Override
-    protected byte[] decryptBlocks(byte[] ciphertext) {
+    protected byte[] decryptBlocks(byte[] ciphertext) throws InterruptedException {
         byte[] plaintext = new byte[ciphertext.length];
 
-        for (int i = 0; i < ciphertext.length; i += blockSize) {
-            byte[] cipherBlock = Arrays.copyOfRange(ciphertext, i, i + blockSize);
-            byte[] plainBlock = xor(cipher.decrypt(cipherBlock), prevBlock);
+        List<DecryptResult> results = ParallelBlockProcessor.processBlocks(
+            ciphertext, blockSize, pool, (idx, start, end) -> {
+                byte[] cipherBlock = Arrays.copyOfRange(ciphertext, start, end);
+                byte[] decryptedBlock = cipher.decrypt(cipherBlock);
+                return new DecryptResult(cipherBlock, decryptedBlock);
+            }
+        );
 
-            System.arraycopy(plainBlock, 0, plaintext, i, blockSize);
+        for (int i = 0; i < results.size(); i++) {
+            DecryptResult result = results.get(i);
+            byte[] cipherBlock = result.cipherBlock();
+            byte[] decryptedBlock = result.decryptedBlock();
+
+            byte[] plainBlock = xor(decryptedBlock, prevBlock);
+            System.arraycopy(plainBlock, 0, plaintext, i * blockSize, blockSize);
 
             prevBlock = xor(cipherBlock, plainBlock);
         }
@@ -67,5 +83,8 @@ public final class PcbcCipherMode extends AbstractCipherMode {
         }
 
         return result;
+    }
+
+    private record DecryptResult(byte[] cipherBlock, byte[] decryptedBlock) {
     }
 }
