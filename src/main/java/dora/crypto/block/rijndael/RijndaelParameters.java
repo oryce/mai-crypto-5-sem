@@ -59,7 +59,7 @@ public final class RijndaelParameters {
         }
 
         public int numColumns() {
-            return value / 2;
+            return value / 4;
         }
 
         public static KeySize of(int value) {
