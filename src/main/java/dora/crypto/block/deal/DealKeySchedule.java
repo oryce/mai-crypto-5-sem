@@ -52,7 +52,7 @@ public final class DealKeySchedule implements KeySchedule {
 
         roundKeys[0] = des.encrypt(keyParts[0]);
         for (int i = 1; i < parts; i++) {
-            roundKeys[i] = des.encrypt(xor(keyParts[i], roundKeys[i - 1]));
+            roundKeys[i] = des.encrypt(KeySchedule.xor(keyParts[i], roundKeys[i - 1]));
         }
 
         for (int k = parts; k < rounds; k++) {
@@ -67,16 +67,6 @@ public final class DealKeySchedule implements KeySchedule {
         }
 
         return roundKeys;
-    }
-
-    private static byte[] xor(byte[] a, byte[] b) {
-        byte[] result = new byte[a.length];
-
-        for (int i = 0; i < a.length; i++) {
-            result[i] = (byte) (a[i] ^ b[i]);
-        }
-
-        return result;
     }
 
     private static byte[] toByteArray(long value) {

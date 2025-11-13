@@ -50,17 +50,17 @@ public final class RijndaelKeySchedule implements KeySchedule {
             if (i < n) {
                 w[i] = Arrays.copyOfRange(key, 4 * i, 4 * i + 4);
             } else if (i % n == 0) {
-                w[i] = xor(
+                w[i] = KeySchedule.xor(
                     w[i - n],
-                    xor(
+                    KeySchedule.xor(
                         subWord(rotWord(w[i - 1])),
                         parameters.rcon()[i / n - 1]
                     )
                 );
             } else if (n < 6 && i % n == 4) {
-                w[i] = xor(w[i - n], subWord(w[i - 1]));
+                w[i] = KeySchedule.xor(w[i - n], subWord(w[i - 1]));
             } else {
-                w[i] = xor(w[i - n], w[i - 1]);
+                w[i] = KeySchedule.xor(w[i - n], w[i - 1]);
             }
         }
 
@@ -90,15 +90,5 @@ public final class RijndaelKeySchedule implements KeySchedule {
             parameters.sBox().lookup(word[2]),
             parameters.sBox().lookup(word[3]),
         };
-    }
-
-    private byte[] xor(byte[] a, byte[] b) {
-        byte[] result = new byte[4];
-
-        for (int i = 0; i < result.length; i++) {
-            result[i] = (byte) (a[i] ^ b[i]);
-        }
-
-        return result;
     }
 }
