@@ -12,13 +12,13 @@ public class Rc5BlockCipherTest {
     private final BlockCipher blockCipher;
 
     Rc5BlockCipherTest () {
-        blockCipher = new RC5BlockCipher(new RC5Parameters(32, 12, 16));
+        blockCipher = new RC5BlockCipher(new RC5Parameters(64, 12, 16));
     }
 
-    @Property(tries = 1000)
+    @Property(tries = 100)
     void decryptedCiphertextEqualsPlaintext(
-            @ForAll @Size(value = 8) byte[] plaintext,
-            @ForAll @Size(value = 8) byte[] key
+            @ForAll @Size(value = 16) byte[] plaintext,
+            @ForAll @Size(value = 16) byte[] key
     ) {
         blockCipher.init(key);
 

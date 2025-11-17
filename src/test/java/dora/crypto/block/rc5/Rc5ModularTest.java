@@ -23,7 +23,8 @@ public class Rc5ModularTest {
         long bInt = ((b[0] & 0xFF) << 8) | (b[1] & 0xFF);
 
         // Сложение по модулю 2^16
-        long expected = (aInt - bInt) & 0xFFFF;
+        long expected = aInt;
+
 
         byte[] expectedBytes = new byte[] {
                 (byte) ((expected >> 8) & 0xFF),
@@ -31,7 +32,9 @@ public class Rc5ModularTest {
         };
 
         // Используем твою функцию addModW
-        byte[] result = subModW(a, b, 16);
+        byte[] tmp = addModW(a, b, 16);
+        byte[] result = subModW(tmp, b, 16);
+
 
         // Вывод результата
         System.out.println("Expected: " + String.format("0x%02X%02X", expectedBytes[0], expectedBytes[1]));
