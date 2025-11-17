@@ -2,7 +2,8 @@ package dora.crypto.block.rc5;
 
 import dora.crypto.block.KeySchedule;
 import org.jetbrains.annotations.NotNull;
-
+import static dora.crypto.block.rc5.RC5BlockCipher.shiftLeft;
+import static dora.crypto.block.rc5.RC5BlockCipher.addModW;
 import java.math.BigInteger;
 
 public final class RC5KeySchedule implements KeySchedule {
@@ -37,7 +38,7 @@ public final class RC5KeySchedule implements KeySchedule {
 
         s[0] = pq.p().toByteArray();
         for (int i = 1; i < keysCount; i++){
-            s[i] = addMod32(s[i-1], pq.q().toByteArray());
+            s[i] = addModW(s[i-1], pq.q().toByteArray(), parameters.w().bitCount());
         }
 
         byte[] g = new byte[resultOneKeySize];
@@ -47,44 +48,16 @@ public final class RC5KeySchedule implements KeySchedule {
 
         int i = 0;
         int j = 0;
-
+        int w = parameters.w().bitCount();
         for (int tmp = 0; tmp < n; tmp++){
-            s[i] = shiftLeft(addMod32(addMod32(s[i], g), h), BigInteger.valueOf(3) );
+            s[i] = shiftLeft(addModW(addModW(s[i], g, w), h, w), BigInteger.valueOf(3));
             g = s[i];
-            l[j] = shiftLeft(addMod32(addMod32(s[i], g), h), new BigInteger(addMod32(g, h)));
+            l[j] = shiftLeft(addModW(addModW(l[j], g, w), h, w),new BigInteger(addModW(g, h, w)));
             h = l[j];
             i = (i + 1) % (2 * (parameters.r() + 1));
             j = (j + 1) % c;
         }
 
         return s;
-    }
-
-    public static byte[] addMod32(byte[] num1, byte[] num2) {
-        byte[] result = new byte[4];
-
-        int carry = 0;
-
-        for (int i = 3; i >= 0; i--) {
-            int sum = (num1[i] & 0xFF) + (num2[i] & 0xFF) + carry;
-            result[i] = (byte) (sum & 0xFF);
-            carry = (sum >> 8) & 0xFF;
-        }
-
-        return result;
-    }
-
-    public static byte[] shiftLeft(byte[] array, BigInteger pos) {
-        pos = pos.mod(BigInteger.valueOf(array.length));
-
-        int positions = pos.intValue();
-
-        byte[] result = new byte[array.length];
-
-        for (int i = 0; i < array.length; i++) {
-            result[(i - positions + array.length) % array.length] = array[i];
-        }
-
-        return result;
     }
 }
