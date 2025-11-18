@@ -12,7 +12,7 @@ public class Rc5BlockCipherTest {
     private final BlockCipher blockCipher;
 
     Rc5BlockCipherTest () {
-        blockCipher = new RC5BlockCipher(new RC5Parameters(64, 12, 16));
+        blockCipher = new RC5BlockCipher(new RC5Parameters(64, 10, 17));
     }
 
     @Property(tries = 100)

@@ -2,21 +2,20 @@ package dora.crypto.block.rc5;
 import net.jqwik.api.*;
 import java.math.BigInteger;
 
-import static dora.crypto.block.rc5.RC5BlockCipher.addModW;
-import static dora.crypto.block.rc5.RC5BlockCipher.subModW;
+import static dora.crypto.block.rc5.RC5BlockCipher.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assumptions.assumeThat;
 
 public class Rc5ModularTest {
 
     public static void main(String[] args) {
-        int w = 16; // 16 бит
-        long aa = 0x0110;   // Максимальное 16-битное число
-        long bb = 0x1111;   // Добавляем 2
+        int w = 64; // 16 бит
+        long aa = 0x1110;   // Максимальное 16-битное число
+        long bb = 65;   // Добавляем 2
 
         // Преобразуем числа в массивы байт длиной 2
-        byte[] a = longToBytes(aa, 2);
-        byte[] b = longToBytes(bb, 2);
+        byte[] a = longToBytes(aa, 8);
+        byte[] b = longToBytes(bb, 8);
 
         // Преобразуем обратно в int для проверки
         long aInt = ((a[0] & 0xFF) << 8) | (a[1] & 0xFF);
@@ -32,8 +31,7 @@ public class Rc5ModularTest {
         };
 
         // Используем твою функцию addModW
-        byte[] tmp = addModW(a, b, 16);
-        byte[] result = subModW(tmp, b, 16);
+        byte[] result = shiftLeft(a, b);
 
 
         // Вывод результата

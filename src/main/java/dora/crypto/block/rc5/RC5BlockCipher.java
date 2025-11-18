@@ -37,8 +37,8 @@ public class RC5BlockCipher implements BlockCipher {
 
         // Основной цикл шифрования
         for (int i = 0; i < parameters.r(); i++) {
-            a = addModW(shiftLeft(xor(a, b), new BigInteger(b)), roundKeys[2 * i], parameters.w().bitCount());
-            b = addModW(shiftLeft(xor(b, a), new BigInteger(a)), roundKeys[2 * i + 1], parameters.w().bitCount());
+            a = addModW(shiftLeft(xor(a, b), b), roundKeys[2 * i], parameters.w().bitCount());
+            b = addModW(shiftLeft(xor(b, a), a), roundKeys[2 * i + 1], parameters.w().bitCount());
         }
 
         byte[] res = new byte[blockSize()];
@@ -55,8 +55,8 @@ public class RC5BlockCipher implements BlockCipher {
 
         // Основной цикл дешифрования (обратный порядок раундов)
         for (int i = parameters.r() - 1; i >= 0; i--) {
-            b = xor(shiftRight(subModW(b, roundKeys[2 * i + 1], parameters.w().bitCount()), new BigInteger(a)), a);
-            a = xor(shiftRight(subModW(a, roundKeys[2 * i], parameters.w().bitCount()), new BigInteger(b)), b);
+            b = xor(shiftRight(subModW(b, roundKeys[2 * i + 1], parameters.w().bitCount()), a), a);
+            a = xor(shiftRight(subModW(a, roundKeys[2 * i], parameters.w().bitCount()), b), b);
         }
 
         a = subModW(a, roundKeys[0], parameters.w().bitCount());
@@ -106,26 +106,67 @@ public class RC5BlockCipher implements BlockCipher {
     }
 
     // Сдвиг влево
-    public static byte[] shiftLeft(byte[] array, BigInteger pos) {
-        pos = pos.mod(BigInteger.valueOf(array.length));
-        int positions = pos.intValue();
+    public static byte[] shiftLeft(byte[] array, byte[] pos) {
+        pos = new byte[] {pos[pos.length - 1]};
+        int positions = (int) (bytesToLong(pos) % (array.length * 8));
+
+        if (positions == 0) {
+            return array.clone();
+        }
 
         byte[] result = new byte[array.length];
-        for (int i = 0; i < array.length; i++) {
-            result[(i - positions + array.length) % array.length] = array[i];
+        int totalBits = array.length * 8;
+
+        for (int i = 0; i < totalBits; i++) {
+            int originalIndex = i;
+            int shiftedIndex = (i + positions) % totalBits;
+
+            int originalByteIndex = originalIndex / 8;
+            int originalBitIndex = 7 - (originalIndex % 8); // Биты нумеруются справа налево
+
+            int shiftedByteIndex = shiftedIndex / 8;
+            int shiftedBitIndex = 7 - (shiftedIndex % 8);
+
+            // Получаем бит из исходного массива
+            boolean bitValue = ((array[originalByteIndex] >> originalBitIndex) & 1) == 1;
+
+            // Устанавливаем бит в результирующем массиве
+            if (bitValue) {
+                result[shiftedByteIndex] |= (byte) (1 << shiftedBitIndex);
+            }
         }
 
         return result;
     }
 
-    // Сдвиг вправо
-    public static byte[] shiftRight(byte[] array, BigInteger pos) {
-        pos = pos.mod(BigInteger.valueOf(array.length));
-        int positions = pos.intValue();
+    public static byte[] shiftRight(byte[] array, byte[] pos) {
+        pos = new byte[] {pos[pos.length - 1]};
+        int positions = (int) (bytesToLong(pos) % (array.length * 8));
+
+        if (positions == 0) {
+            return array.clone();
+        }
 
         byte[] result = new byte[array.length];
-        for (int i = 0; i < array.length; i++) {
-            result[(i + positions) % array.length] = array[i];
+        int totalBits = array.length * 8;
+
+        for (int i = 0; i < totalBits; i++) {
+            int originalIndex = i;
+            int shiftedIndex = (i - positions + totalBits) % totalBits;
+
+            int originalByteIndex = originalIndex / 8;
+            int originalBitIndex = 7 - (originalIndex % 8);
+
+            int shiftedByteIndex = shiftedIndex / 8;
+            int shiftedBitIndex = 7 - (shiftedIndex % 8);
+
+            // Получаем бит из исходного массива
+            boolean bitValue = ((array[originalByteIndex] >> originalBitIndex) & 1) == 1;
+
+            // Устанавливаем бит в результирующем массиве
+            if (bitValue) {
+                result[shiftedByteIndex] |= (byte) (1 << shiftedBitIndex);
+            }
         }
 
         return result;
@@ -138,6 +179,30 @@ public class RC5BlockCipher implements BlockCipher {
             result[i] = (byte) (a[i] ^ b[i]);
         }
 
+        return result;
+    }
+
+    public static byte[] longToBytes(int num, int byteCount) {
+        if (byteCount < 1 || byteCount > 8) {
+            throw new IllegalArgumentException("byteCount должен быть от 1 до 8");
+        }
+
+        byte[] bytes = new byte[byteCount];
+        for (int i = 0; i < byteCount; i++) {
+            bytes[i] = (byte) (num >> (8 * (byteCount - 1 - i)));
+        }
+        return bytes;
+    }
+
+    public static int bytesToLong(byte[] bytes) {
+        if (bytes.length < 1 || bytes.length > 8) {
+            throw new IllegalArgumentException("Длина массива должна быть от 1 до 8");
+        }
+
+        int result = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            result |= ((int) (bytes[i] & 0xFF)) << (8 * (bytes.length - 1 - i));
+        }
         return result;
     }
 }

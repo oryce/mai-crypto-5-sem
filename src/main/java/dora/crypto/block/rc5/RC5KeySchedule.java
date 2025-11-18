@@ -37,9 +37,9 @@ public final class RC5KeySchedule implements KeySchedule {
         }
 
         // Инициализируем массив S
-        s[0] = safeToByteArray(pq.p(), resultOneKeySize);
+        s[0] = Arrays.copyOf(pq.p(), pq.q().length);
         for (int i = 1; i < keysCount; i++) {
-            s[i] = addModW(s[i - 1], safeToByteArray(pq.q(), resultOneKeySize), parameters.w().bitCount());
+            s[i] = addModW(s[i - 1], pq.q(), parameters.w().bitCount());
         }
 
         byte[] g = new byte[resultOneKeySize];
@@ -51,32 +51,14 @@ public final class RC5KeySchedule implements KeySchedule {
         int j = 0;
         int w = parameters.w().bitCount();
         for (int tmp = 0; tmp < n; tmp++) {
-            s[i] = shiftLeft(addModW(addModW(s[i], g, w), h, w), BigInteger.valueOf(3));
+            s[i] = shiftLeft(addModW(addModW(s[i], g, w), h, w), new byte[] {3});
             g = Arrays.copyOf(s[i], resultOneKeySize);
-            l[j] = shiftLeft(addModW(addModW(l[j], g, w), h, w), new BigInteger(addModW(g, h, w)).mod(BigInteger.valueOf(w)));
+            l[j] = shiftLeft(addModW(addModW(l[j], g, w), h, w), addModW(g, h, w));
             h = Arrays.copyOf(l[j], resultOneKeySize);
             i = (i + 1) % (2 * (parameters.r() + 1));
             j = (j + 1) % c;
         }
 
         return s;
-    }
-
-    // Безопасное преобразование BigInteger в массив байт заданного размера
-    private byte[] safeToByteArray(BigInteger value, int size) {
-        byte[] bytes = value.toByteArray();
-        if (bytes.length < size) {
-            // Добавляем нули в начале, если размер байтов меньше необходимого
-            byte[] padded = new byte[size];
-            System.arraycopy(bytes, 0, padded, size - bytes.length, bytes.length);
-            return padded;
-        } else if (bytes.length > size) {
-            // Обрезаем старший байт, если размер байтов больше необходимого
-            byte[] truncated = new byte[size];
-            System.arraycopy(bytes, bytes.length - size, truncated, 0, size);
-            return truncated;
-        } else {
-            return bytes;
-        }
     }
 }
