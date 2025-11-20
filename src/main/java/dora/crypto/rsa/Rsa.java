@@ -71,7 +71,7 @@ public final class Rsa {
         }
     }
 
-    public static final class KeyPairGenerator {
+    public static class KeyPairGenerator {
 
         private static final BigInteger DEFAULT_EXPONENT = BigInteger.valueOf(65537);
 
@@ -79,8 +79,8 @@ public final class Rsa {
         private final double certainty;
         private final int primeSize;
 
-        private final SecureRandom random = new SecureRandom();
-        private final RsaMath math = new RsaMath();
+        protected final SecureRandom random = new SecureRandom();
+        protected final RsaMath math = new RsaMath();
 
         public KeyPairGenerator(@NotNull PrimalityTestType primalityTest, double certainty, int primeSize) {
             if (!(certainty >= 0.5 && certainty < 1.0))
@@ -143,6 +143,18 @@ public final class Rsa {
         }
 
         public record KeyPair(BigInteger n, BigInteger e, BigInteger d) {
+        }
+
+        public PrimalityTest primalityTest() {
+            return primalityTest;
+        }
+
+        public double certainty() {
+            return certainty;
+        }
+
+        public int primeSize() {
+            return primeSize;
         }
     }
 }
