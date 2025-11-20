@@ -9,6 +9,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.stream.IntStream;
 
 public final class RandomDeltaCipherMode extends AbstractCipherMode {
+    private final static int minRandomBound = 1;
+    private final static int maxRandomBound = 100;
 
     private final ForkJoinPool pool;
 
@@ -66,7 +68,7 @@ public final class RandomDeltaCipherMode extends AbstractCipherMode {
         byte[] result = new byte[data.length];
 
         long[] increments = IntStream.range(0, data.length / blockSize)
-            .mapToLong((i) -> random.nextLong(1, 100))
+            .mapToLong((i) -> random.nextLong(minRandomBound, maxRandomBound))
             .toArray();
 
         ParallelBlockProcessor.processBlocks(
