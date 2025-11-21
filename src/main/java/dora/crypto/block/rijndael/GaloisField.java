@@ -51,11 +51,7 @@ public final class GaloisField {
     public byte inv(byte f, short mod) {
         if (!irreducible(mod))
             throw new IllegalArgumentException("Modulus may not be reducible");
-
-        return (byte) inv(
-            Byte.toUnsignedLong(f),
-            Short.toUnsignedLong(mod)
-        );
+        return invUnchecked(f, mod);
     }
 
     /**
