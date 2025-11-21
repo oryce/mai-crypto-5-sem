@@ -111,6 +111,7 @@ public final class WienerAttack {
 
     public static class VulnerableKeyPairGenerator extends KeyPairGenerator {
 
+        private static final BigInteger MIN_EXPONENT = BigInteger.valueOf(65537);
         private static final BigInteger THREE = BigInteger.valueOf(3);
 
         public VulnerableKeyPairGenerator(@NotNull PrimalityTestType primalityTest, double certainty, int primeSize) {
@@ -133,6 +134,10 @@ public final class WienerAttack {
                 return null;
 
             e = math.modInverse(d, phi);
+
+            if (e.compareTo(MIN_EXPONENT) < 0)
+                /* discard small exponents to mitigate other attacks */
+                return null;
 
             return new KeyPair(n, e, d);
         }
