@@ -12,15 +12,11 @@ public class Rc5BlockCipherTest {
 
     private BlockCipher blockCipher;
 
-    Rc5BlockCipherTest () {
-        blockCipher = new RC5BlockCipher(new RC5Parameters(64, 10, 17));
-    }
-
     @Property(tries = 100)
     void decryptedCiphertextEqualsPlaintext64(
-            @ForAll @Size(value = 16) byte[] plaintext,
-            @ForAll @Size(min = 1, max = 255) byte[] key,
-            @ForAll @IntRange(min = 0, max = 255) int r
+        @ForAll @Size(value = 16) byte[] plaintext,
+        @ForAll @Size(min = 1, max = 255) byte[] key,
+        @ForAll @IntRange(min = 0, max = 255) int r
     ) {
         blockCipher = new RC5BlockCipher(new RC5Parameters(64, r, key.length));
         blockCipher.init(key);
@@ -33,9 +29,9 @@ public class Rc5BlockCipherTest {
 
     @Property(tries = 100)
     void decryptedCiphertextEqualsPlaintext32(
-            @ForAll @Size(value = 8) byte[] plaintext,
-            @ForAll @Size(min = 1, max = 255) byte[] key,
-            @ForAll @IntRange(min = 0, max = 255) int r
+       @ForAll @Size(value = 8) byte[] plaintext,
+       @ForAll @Size(min = 1, max = 255) byte[] key,
+       @ForAll @IntRange(min = 0, max = 255) int r
     ) {
         blockCipher = new RC5BlockCipher(new RC5Parameters(32, r, key.length));
         blockCipher.init(key);
@@ -48,9 +44,9 @@ public class Rc5BlockCipherTest {
 
     @Property(tries = 100)
     void decryptedCiphertextEqualsPlaintext16(
-            @ForAll @Size(value = 4) byte[] plaintext,
-            @ForAll @Size(min = 1, max = 255) byte[] key,
-            @ForAll @IntRange(min = 0, max = 255) int r
+        @ForAll @Size(value = 4) byte[] plaintext,
+        @ForAll @Size(min = 1, max = 255) byte[] key,
+        @ForAll @IntRange(min = 0, max = 255) int r
     ) {
         blockCipher = new RC5BlockCipher(new RC5Parameters(16, r, key.length));
         blockCipher.init(key);

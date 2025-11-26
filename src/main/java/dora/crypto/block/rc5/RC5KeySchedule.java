@@ -7,17 +7,19 @@ import java.util.Arrays;
 
 import static dora.crypto.block.rc5.RC5BlockCipher.shiftLeft;
 import static dora.crypto.block.rc5.RC5BlockCipher.addModW;
+import static java.util.Objects.requireNonNull;
 
 public final class RC5KeySchedule implements KeySchedule {
+
     private final RC5Parameters parameters;
 
-    public RC5KeySchedule(@NotNull RC5Parameters params) {
-        this.parameters = params;
+    public RC5KeySchedule(@NotNull RC5Parameters parameters) {
+        this.parameters = requireNonNull(parameters, "parameters");
     }
 
     @Override
     public byte[][] roundKeys(byte @NotNull [] key) {
-        var pq = new PQConstants(parameters.w().bitCount());
+        PQConstants pq = new PQConstants(parameters.w().bitCount());
         int resultOneKeySize = parameters.w().byteCount();
         int c = Math.max(1, Math.ceilDiv(parameters.b(), resultOneKeySize));
 
@@ -25,7 +27,6 @@ public final class RC5KeySchedule implements KeySchedule {
         int keysCount = 2 * (parameters.r() + 1);
         byte[][] s = new byte[keysCount][resultOneKeySize];
 
-        // Заполняем L массив с ключа
         for (int i = 0; i < c; i++) {
             for (int j = 0; j < resultOneKeySize; j++) {
                 if (i * resultOneKeySize + j < key.length) {
@@ -36,7 +37,6 @@ public final class RC5KeySchedule implements KeySchedule {
             }
         }
 
-        // Инициализируем массив S
         s[0] = Arrays.copyOf(pq.p(), pq.q().length);
         for (int i = 1; i < keysCount; i++) {
             s[i] = addModW(s[i - 1], pq.q(), parameters.w().bitCount());

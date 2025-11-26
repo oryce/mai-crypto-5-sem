@@ -5,15 +5,19 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 public class RC5BlockCipher implements BlockCipher {
+
     private final RC5Parameters parameters;
     private final RC5KeySchedule keySchedule;
     private byte[][] roundKeys;
 
-    public RC5BlockCipher(@NotNull RC5Parameters params) {
-        parameters = params;
-        keySchedule = new RC5KeySchedule(parameters);
+    public RC5BlockCipher(@NotNull RC5Parameters parameters) {
+        this.parameters = requireNonNull(parameters, "parameters");
+        keySchedule = new RC5KeySchedule(this.parameters);
     }
 
     @Override
@@ -28,14 +32,21 @@ public class RC5BlockCipher implements BlockCipher {
 
     @Override
     public byte[] encrypt(byte @NotNull [] plaintext) {
-        var a = Arrays.copyOfRange(plaintext, 0, plaintext.length / 2);
-        var b = Arrays.copyOfRange(plaintext, plaintext.length / 2, plaintext.length);
+        requireNonNull(plaintext, "plaintext");
 
-        // Инициализация с раундовыми ключами
+        if (roundKeys == null)
+            throw new IllegalStateException("Cipher is not initialized");
+
+        if (plaintext.length != blockSize()){
+            throw new IllegalArgumentException("Invalid block size");
+        }
+
+        byte[] a = Arrays.copyOfRange(plaintext, 0, plaintext.length / 2);
+        byte[] b = Arrays.copyOfRange(plaintext, plaintext.length / 2, plaintext.length);
+
         a = addModW(a, roundKeys[0], parameters.w().bitCount());
         b = addModW(b, roundKeys[1], parameters.w().bitCount());
 
-        // Основной цикл шифрования
         for (int i = 0; i < parameters.r(); i++) {
             a = addModW(shiftLeft(xor(a, b), b), roundKeys[2 * i], parameters.w().bitCount());
             b = addModW(shiftLeft(xor(b, a), a), roundKeys[2 * i + 1], parameters.w().bitCount());
@@ -50,10 +61,14 @@ public class RC5BlockCipher implements BlockCipher {
 
     @Override
     public byte[] decrypt(byte @NotNull [] ciphertext) {
-        var a = Arrays.copyOfRange(ciphertext, 0, ciphertext.length / 2);
-        var b = Arrays.copyOfRange(ciphertext, ciphertext.length / 2, ciphertext.length);
+        requireNonNull(ciphertext, "ciphertext");
 
-        // Основной цикл дешифрования (обратный порядок раундов)
+        if (roundKeys == null)
+            throw new IllegalStateException("Cipher is not initialized");
+
+        byte[] a = Arrays.copyOfRange(ciphertext, 0, ciphertext.length / 2);
+        byte[] b = Arrays.copyOfRange(ciphertext, ciphertext.length / 2, ciphertext.length);
+
         for (int i = parameters.r() - 1; i >= 0; i--) {
             b = xor(shiftRight(subModW(b, roundKeys[2 * i + 1], parameters.w().bitCount()), a), a);
             a = xor(shiftRight(subModW(a, roundKeys[2 * i], parameters.w().bitCount()), b), b);
@@ -62,16 +77,23 @@ public class RC5BlockCipher implements BlockCipher {
         a = subModW(a, roundKeys[0], parameters.w().bitCount());
         b = subModW(b, roundKeys[1], parameters.w().bitCount());
 
+        byte[] result = new byte[blockSize()];
+        System.arraycopy(a, 0, result, 0, a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
 
-        byte[] res = new byte[blockSize()];
-        System.arraycopy(a, 0, res, 0, a.length);
-        System.arraycopy(b, 0, res, a.length, b.length);
-        return res;
+        return result;
     }
 
-    // Сложение по модулю 2^w
+    /**
+     * Adds two byte-array integers modulo 2^w.
+     *
+     * @param num1 the first value
+     * @param num2 the second value
+     * @param w the bit width for the modulus (mod 2^w)
+     * @return (num1 + num2) mod 2^w as a byte array
+     */
     public static byte[] addModW(byte[] num1, byte[] num2, int w) {
-        int byteSize = w / 8;
+        int byteSize = w / Byte.SIZE;
         byte[] result = new byte[byteSize];
         int carry = 0;
 
@@ -84,9 +106,16 @@ public class RC5BlockCipher implements BlockCipher {
         return result;
     }
 
-    // Вычитание по модулю 2^w
+    /**
+     * Subtracts two byte-array integers modulo 2^w.
+     *
+     * @param num1 the first value
+     * @param num2 the second value
+     * @param w the bit width for the modulus (mod 2^w)
+     * @return (num1 + num2) mod 2^w as a byte array
+     */
     public static byte[] subModW(byte[] num1, byte[] num2, int w) {
-        int byteSize = w / 8;
+        int byteSize = w / Byte.SIZE;
         byte[] result = new byte[byteSize];
         int borrow = 0;
 
@@ -105,7 +134,13 @@ public class RC5BlockCipher implements BlockCipher {
         return result;
     }
 
-    // Сдвиг влево
+    /**
+     * Shifts left a number, represented in byte array
+     *
+     * @param array the number to be shifted
+     * @param pos amount of shifts represented in byte array
+     * @return shifted number
+     */
     public static byte[] shiftLeft(byte[] array, byte[] pos) {
         pos = new byte[] {pos[pos.length - 1]};
         int positions = (int) (bytesToLong(pos) % (array.length * 8));
@@ -122,15 +157,13 @@ public class RC5BlockCipher implements BlockCipher {
             int shiftedIndex = (i + positions) % totalBits;
 
             int originalByteIndex = originalIndex / 8;
-            int originalBitIndex = 7 - (originalIndex % 8); // Биты нумеруются справа налево
+            int originalBitIndex = 7 - (originalIndex % 8);
 
             int shiftedByteIndex = shiftedIndex / 8;
             int shiftedBitIndex = 7 - (shiftedIndex % 8);
 
-            // Получаем бит из исходного массива
             boolean bitValue = ((array[originalByteIndex] >> originalBitIndex) & 1) == 1;
 
-            // Устанавливаем бит в результирующем массиве
             if (bitValue) {
                 result[shiftedByteIndex] |= (byte) (1 << shiftedBitIndex);
             }
@@ -139,6 +172,13 @@ public class RC5BlockCipher implements BlockCipher {
         return result;
     }
 
+    /**
+     * Shifts right a number, represented in byte array
+     *
+     * @param array the number to be shifted
+     * @param pos amount of shifts represented in byte array
+     * @return shifted number
+     */
     public static byte[] shiftRight(byte[] array, byte[] pos) {
         pos = new byte[] {pos[pos.length - 1]};
         int positions = (int) (bytesToLong(pos) % (array.length * 8));
@@ -160,10 +200,8 @@ public class RC5BlockCipher implements BlockCipher {
             int shiftedByteIndex = shiftedIndex / 8;
             int shiftedBitIndex = 7 - (shiftedIndex % 8);
 
-            // Получаем бит из исходного массива
             boolean bitValue = ((array[originalByteIndex] >> originalBitIndex) & 1) == 1;
 
-            // Устанавливаем бит в результирующем массиве
             if (bitValue) {
                 result[shiftedByteIndex] |= (byte) (1 << shiftedBitIndex);
             }
@@ -172,7 +210,6 @@ public class RC5BlockCipher implements BlockCipher {
         return result;
     }
 
-    // Операция XOR
     private byte[] xor(byte[] a, byte[] b) {
         byte[] result = new byte[a.length];
         for (int i = 0; i < result.length; i++) {
@@ -180,18 +217,6 @@ public class RC5BlockCipher implements BlockCipher {
         }
 
         return result;
-    }
-
-    public static byte[] longToBytes(int num, int byteCount) {
-        if (byteCount < 1 || byteCount > 8) {
-            throw new IllegalArgumentException("byteCount должен быть от 1 до 8");
-        }
-
-        byte[] bytes = new byte[byteCount];
-        for (int i = 0; i < byteCount; i++) {
-            bytes[i] = (byte) (num >> (8 * (byteCount - 1 - i)));
-        }
-        return bytes;
     }
 
     public static int bytesToLong(byte[] bytes) {
