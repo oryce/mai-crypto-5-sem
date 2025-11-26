@@ -4,6 +4,7 @@ import dora.crypto.block.BlockCipher;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -219,15 +220,15 @@ public class RC5BlockCipher implements BlockCipher {
         return result;
     }
 
-    public static int bytesToLong(byte[] bytes) {
+    public static long bytesToLong(byte[] bytes) {
         if (bytes.length < 1 || bytes.length > 8) {
-            throw new IllegalArgumentException("Длина массива должна быть от 1 до 8");
+            throw new IllegalArgumentException("Length must be between 1 and 8");
         }
 
-        int result = 0;
-        for (int i = 0; i < bytes.length; i++) {
-            result |= ((int) (bytes[i] & 0xFF)) << (8 * (bytes.length - 1 - i));
-        }
-        return result;
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.put(new byte[8 - bytes.length]);
+        buffer.put(bytes);
+        buffer.flip();
+        return buffer.getLong();
     }
 }
