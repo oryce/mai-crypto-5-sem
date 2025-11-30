@@ -14,6 +14,8 @@
 
     <modules>
         <module>crypto-library</module>
+        <module>crypto-messenger-client</module>
+        <module>crypto-messenger-server</module>
     </modules>
 
     <properties>
@@ -22,7 +24,9 @@
 
         <dependency.annotations.version>24.1.0</dependency.annotations.version>
         <dependency.assert4j.version>3.27.3</dependency.assert4j.version>
+        <dependency.flatlaf.version>3.6.2</dependency.flatlaf.version>
         <dependency.jqwik.version>1.9.3</dependency.jqwik.version>
+        <dependency.spring.version>3.5.8</dependency.spring.version>
     </properties>
 
     <build>
@@ -52,6 +56,14 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${dependency.spring.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
                 <version>${dependency.annotations.version}</version>
@@ -60,6 +72,11 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${dependency.assert4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.formdev</groupId>
+                <artifactId>flatlaf</artifactId>
+                <version>${dependency.flatlaf.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.jqwik</groupId>

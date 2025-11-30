@@ -12,25 +12,15 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>crypto-library</artifactId>
+    <artifactId>crypto-messenger-client</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>Dora Crypto Library</name>
+    <name>Dora Messenger Client</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.jqwik</groupId>
-            <artifactId>jqwik</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
         </dependency>
     </dependencies>
 
