@@ -12,25 +12,21 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>crypto-library</artifactId>
+    <artifactId>crypto-messenger-protocol</artifactId>
 
-    <name>Dora Crypto Library</name>
-    <description>Cryptographic primitives</description>
+    <name>Dora Messenger Protocol</name>
+    <description>Common objects for Dora Messenger</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>net.jqwik</groupId>
-            <artifactId>jqwik</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
