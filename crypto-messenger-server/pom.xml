@@ -13,6 +13,7 @@
     </parent>
 
     <artifactId>crypto-messenger-server</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
     <name>Dora Messenger Server</name>
     <description>Server application for Dora Messenger</description>

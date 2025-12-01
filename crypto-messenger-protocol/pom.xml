@@ -13,6 +13,7 @@
     </parent>
 
     <artifactId>crypto-messenger-protocol</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
     <name>Dora Messenger Protocol</name>
     <description>Common objects for Dora Messenger</description>

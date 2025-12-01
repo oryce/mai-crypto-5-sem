@@ -13,6 +13,7 @@
     </parent>
 
     <artifactId>crypto-messenger-client</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
     <name>Dora Messenger Client</name>
     <description>Client application for Dora Messenger</description>

@@ -13,6 +13,7 @@
     </parent>
 
     <artifactId>crypto-library</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
     <name>Dora Crypto Library</name>
     <description>Cryptographic primitives</description>
@@ -22,6 +23,7 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
         </dependency>
+
         <dependency>
             <groupId>net.jqwik</groupId>
             <artifactId>jqwik</artifactId>
