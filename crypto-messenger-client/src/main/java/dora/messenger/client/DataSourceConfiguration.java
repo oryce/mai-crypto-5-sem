@@ -12,10 +12,7 @@ public class DataSourceConfiguration {
     @Bean
     public DataSource dataSource() {
         var dataSource = new DriverManagerDataSource();
-
-        dataSource.setDriverClassName(org.sqlite.JDBC.class.getName());
         dataSource.setUrl("jdbc:sqlite:example.db:exampleDb");
-
         return dataSource;
     }
 }
