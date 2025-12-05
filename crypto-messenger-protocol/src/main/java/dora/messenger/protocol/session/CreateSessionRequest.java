@@ -1,4 +1,4 @@
-package dora.messenger.protocol;
+package dora.messenger.protocol.session;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

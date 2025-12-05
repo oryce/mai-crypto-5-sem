@@ -25,10 +25,12 @@
 
         <dependency.annotations.version>26.0.2-1</dependency.annotations.version>
         <dependency.assertj.version>3.27.6</dependency.assertj.version>
+        <dependency.bouncycastle.version>1.83</dependency.bouncycastle.version>
         <dependency.flatlaf.version>3.6.2</dependency.flatlaf.version>
         <dependency.jqwik.version>1.9.3</dependency.jqwik.version>
+        <dependency.jwt.version>4.5.0</dependency.jwt.version>
         <dependency.lombok.version>1.18.42</dependency.lombok.version>
-        <dependency.spring.version>4.0.0</dependency.spring.version>
+        <dependency.spring-boot.version>4.0.0</dependency.spring-boot.version>
         <dependency.springdoc.version>3.0.0</dependency.springdoc.version>
         <dependency.swagger.version>2.2.41</dependency.swagger.version>
         <dependency.sqlite.version>3.51.0.0</dependency.sqlite.version>
@@ -42,7 +44,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${dependency.spring.version}</version>
+                <version>${dependency.spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -58,6 +60,11 @@
                 <version>${dependency.assertj.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${dependency.bouncycastle.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.formdev</groupId>
                 <artifactId>flatlaf</artifactId>
                 <version>${dependency.flatlaf.version}</version>
@@ -66,6 +73,11 @@
                 <groupId>net.jqwik</groupId>
                 <artifactId>jqwik</artifactId>
                 <version>${dependency.jqwik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.auth0</groupId>
+                <artifactId>java-jwt</artifactId>
+                <version>${dependency.jwt.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
@@ -113,7 +125,7 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${dependency.spring.version}</version>
+                    <version>${dependency.spring-boot.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
