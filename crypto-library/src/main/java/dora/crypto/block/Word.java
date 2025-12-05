@@ -1,4 +1,4 @@
-package dora.crypto.block.rc5;
+package dora.crypto.block;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -12,11 +12,13 @@ public sealed interface Word permits
 
     Word sub(Word other);
 
+    Word mul(Word other);
+
+    Word xor(Word other);
+
     Word rotateLeft(Word distance);
 
     Word rotateRight(Word distance);
-
-    Word xor(Word other);
 
     byte[] toByteArray();
 
@@ -26,7 +28,7 @@ public sealed interface Word permits
             case Short.BYTES -> ShortBacked.fromByteArray(bytes);
             case Integer.BYTES -> IntBacked.fromByteArray(bytes);
             case Long.BYTES -> LongBacked.fromByteArray(bytes);
-            default -> throw new IllegalArgumentException("Unsupported word length");
+            default -> throw new IllegalArgumentException("Unsupported word size");
         };
     }
 
@@ -71,6 +73,18 @@ public sealed interface Word permits
         }
 
         @Override
+        public Word mul(Word other) {
+            short result = (short) (value * unwrap(other));
+            return new ShortBacked(result);
+        }
+
+        @Override
+        public Word xor(Word other) {
+            short result = (short) (value ^ unwrap(other));
+            return new ShortBacked(result);
+        }
+
+        @Override
         public Word rotateLeft(Word distance) {
             int distanceValue = unwrap(distance) & 0xf;
             int unsignedValue = Short.toUnsignedInt(value);
@@ -86,12 +100,6 @@ public sealed interface Word permits
             int result = (unsignedValue >>> distanceValue)
                        | (unsignedValue << (Short.SIZE - distanceValue));
             return new ShortBacked((short) result);
-        }
-
-        @Override
-        public Word xor(Word other) {
-            short result = (short) (value ^ unwrap(other));
-            return new ShortBacked(result);
         }
 
         @Override
@@ -132,6 +140,18 @@ public sealed interface Word permits
         }
 
         @Override
+        public Word mul(Word other) {
+            int result = value * unwrap(other);
+            return new IntBacked(result);
+        }
+
+        @Override
+        public Word xor(Word other) {
+            int result = value ^ unwrap(other);
+            return new IntBacked(result);
+        }
+
+        @Override
         public Word rotateLeft(Word distance) {
             int result = Integer.rotateLeft(value, unwrap(distance));
             return new IntBacked(result);
@@ -140,12 +160,6 @@ public sealed interface Word permits
         @Override
         public Word rotateRight(Word distance) {
             int result = Integer.rotateRight(value, unwrap(distance));
-            return new IntBacked(result);
-        }
-
-        @Override
-        public Word xor(Word other) {
-            int result = value ^ unwrap(other);
             return new IntBacked(result);
         }
 
@@ -191,6 +205,18 @@ public sealed interface Word permits
         }
 
         @Override
+        public Word mul(Word other) {
+            long result = value * unwrap(other);
+            return new LongBacked(result);
+        }
+
+        @Override
+        public Word xor(Word other) {
+            long result = value ^ unwrap(other);
+            return new LongBacked(result);
+        }
+
+        @Override
         public Word rotateLeft(Word distance) {
             long distanceValue = unwrap(distance);
             long result = value << distanceValue | (value >>> -distanceValue);
@@ -201,12 +227,6 @@ public sealed interface Word permits
         public Word rotateRight(Word distance) {
             long distanceValue = unwrap(distance);
             long result = (value >>> distanceValue) | (value << -distanceValue);
-            return new LongBacked(result);
-        }
-
-        @Override
-        public Word xor(Word other) {
-            long result = value ^ unwrap(other);
             return new LongBacked(result);
         }
 

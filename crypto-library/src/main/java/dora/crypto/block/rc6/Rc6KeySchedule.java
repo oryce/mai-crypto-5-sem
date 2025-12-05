@@ -1,8 +1,8 @@
-package dora.crypto.block.rc5;
+package dora.crypto.block.rc6;
 
 import dora.crypto.block.KeySchedule;
 import dora.crypto.block.Word;
-import dora.crypto.block.rc5.Rc5Parameters.WordSize;
+import dora.crypto.block.rc6.Rc6Parameters.WordSize;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
-public final class Rc5KeySchedule implements KeySchedule {
+public final class Rc6KeySchedule implements KeySchedule {
 
     private static final Map<WordSize, Word> P = Map.ofEntries(
         Map.entry(WordSize.WORD_SIZE_16, Word.of(0xB7E1L, 16)),
@@ -24,9 +24,9 @@ public final class Rc5KeySchedule implements KeySchedule {
         Map.entry(WordSize.WORD_SIZE_64, Word.of(0x9E3779B97F4A7C15L, 64))
     );
 
-    private final Rc5Parameters parameters;
+    private final Rc6Parameters parameters;
 
-    public Rc5KeySchedule(@NotNull Rc5Parameters parameters) {
+    public Rc6KeySchedule(@NotNull Rc6Parameters parameters) {
         this.parameters = requireNonNull(parameters, "parameters");
     }
 
@@ -37,7 +37,7 @@ public final class Rc5KeySchedule implements KeySchedule {
         if (key.length != parameters.keySize())
             throw new IllegalArgumentException("Invalid key size");
 
-        /* https://en.wikipedia.org/wiki/RC5#Key_expansion */
+        // RC6 key schedule is identical to RC5, expect RC6 has more round keys.
 
         Word p = P.get(parameters.wordSize());
         Word q = Q.get(parameters.wordSize());
@@ -45,7 +45,7 @@ public final class Rc5KeySchedule implements KeySchedule {
         int wordBits = parameters.wordSize().bits();
         int wordBytes = parameters.wordSize().bytes();
         int keyWords = Math.max(1, Math.ceilDiv(key.length, wordBytes));
-        int roundKeys = 2 * (parameters.rounds() + 1);
+        int roundKeys = 2 * parameters.rounds() + 4;
 
         Word[] L = new Word[keyWords];
 
@@ -68,7 +68,7 @@ public final class Rc5KeySchedule implements KeySchedule {
         int i = 0;
         int j = 0;
 
-        for (int k = 0; k < 3 * Math.max(roundKeys, keyWords); k++) {
+        for (int k = 1; k <= 3 * Math.max(keyWords, roundKeys); k++) {
             A = S[i] = S[i].add(A).add(B).rotateLeft(three);
             B = L[j] = L[j].add(A).add(B).rotateLeft(A.add(B));
             i = (i + 1) % roundKeys;

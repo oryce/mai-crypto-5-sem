@@ -1,9 +1,9 @@
 package dora.crypto.block.rc5;
 
 import dora.crypto.block.BlockCipher;
+import dora.crypto.block.Word;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import static java.util.Objects.requireNonNull;
