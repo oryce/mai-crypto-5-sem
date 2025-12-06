@@ -110,6 +110,14 @@ public class SessionService {
         sessions.save(session);
     }
 
+    public void invalidateSession(
+        @Validated
+        @NotNull(message = "Session may not be null")
+        Session session
+    ) {
+        sessions.delete(session);
+    }
+
     public static final class InvalidCredentialsException extends RuntimeException {
 
         public InvalidCredentialsException() {

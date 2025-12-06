@@ -1,5 +1,6 @@
 package dora.messenger.server.session;
 
+import lombok.Getter;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -7,6 +8,7 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import java.util.Collections;
 import java.util.Objects;
 
+@Getter
 public class SessionAuthenticationToken extends AbstractAuthenticationToken {
 
     private final Session session;
