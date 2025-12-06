@@ -21,7 +21,7 @@ public class SecurityConfiguration {
     private final Environment environment;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.sessionManagement((sessions) ->
             sessions.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );

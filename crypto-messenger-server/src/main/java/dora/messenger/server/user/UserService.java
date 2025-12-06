@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -64,5 +66,30 @@ public class UserService {
     }
 
     public record RegisterResult(User user, SessionCredentials credentials) {
+    }
+
+    public User getById(UUID userId) {
+        return users.findById(userId)
+            .orElseThrow(() -> UserNotFoundException.ofId(userId));
+    }
+
+    public User getByUsername(String username) {
+        return users.findByUsername(username)
+            .orElseThrow(() -> UserNotFoundException.ofUsername(username));
+    }
+
+    public static final class UserNotFoundException extends RuntimeException {
+
+        private UserNotFoundException(String key, Object value) {
+            super("User with %s \"%s\" does not exist".formatted(key, value));
+        }
+
+        public static UserNotFoundException ofId(UUID id) {
+            return new UserNotFoundException("ID", id);
+        }
+
+        public static UserNotFoundException ofUsername(String username) {
+            return new UserNotFoundException("username", username);
+        }
     }
 }

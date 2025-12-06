@@ -69,20 +69,12 @@ public class SessionService {
         return sessions.save(session);
     }
 
-    public SessionCredentials createCredentials(
-        @Validated
-        @NotNull(message = "Session may not be null")
-        Session session
-    ) {
+    public SessionCredentials createCredentials(Session session) {
         String accessToken = tokenIssuer.createToken(TokenIssuer.Metadata.of(session));
         return new SessionCredentials(accessToken);
     }
 
-    public Session validateAccessToken(
-        @Validated
-        @NotBlank(message = "Access token may not be blank")
-        String accessToken
-    ) {
+    public Session validateAccessToken(String accessToken) {
         TokenIssuer.Metadata metadata;
 
         try {
@@ -101,20 +93,12 @@ public class SessionService {
         return session;
     }
 
-    public void refreshSession(
-        @Validated
-        @NotNull(message = "Session may not be null")
-        Session session
-    ) {
+    public void refreshSession(Session session) {
         session.setExpiresAt(Instant.now().plus(lifetime));
         sessions.save(session);
     }
 
-    public void invalidateSession(
-        @Validated
-        @NotNull(message = "Session may not be null")
-        Session session
-    ) {
+    public void invalidateSession(Session session) {
         sessions.delete(session);
     }
 

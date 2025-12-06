@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record CreateUserRequest(
+public record CreateUser(
     @Schema(description = "First name")
     @Size(min = 1, max = 32)
     @NotBlank

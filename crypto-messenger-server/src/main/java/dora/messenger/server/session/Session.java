@@ -1,5 +1,6 @@
 package dora.messenger.server.session;
 
+import dora.messenger.protocol.session.SessionDto;
 import dora.messenger.server.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.mapstruct.MappingConstants.ComponentModel;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -37,5 +39,11 @@ public class Session {
 
     public boolean isExpired() {
         return Instant.now().isAfter(expiresAt);
+    }
+
+    @org.mapstruct.Mapper(componentModel = ComponentModel.SPRING)
+    public interface Mapper {
+
+        SessionDto toDto(Session session);
     }
 }

@@ -30,6 +30,8 @@
         <dependency.jqwik.version>1.9.3</dependency.jqwik.version>
         <dependency.jwt.version>4.5.0</dependency.jwt.version>
         <dependency.lombok.version>1.18.42</dependency.lombok.version>
+        <dependency.mapstruct.version>1.6.3</dependency.mapstruct.version>
+        <dependency.mapstruct-binding.version>0.2.0</dependency.mapstruct-binding.version>
         <dependency.spring-boot.version>4.0.0</dependency.spring-boot.version>
         <dependency.springdoc.version>3.0.0</dependency.springdoc.version>
         <dependency.swagger.version>2.2.41</dependency.swagger.version>
@@ -83,6 +85,12 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${dependency.lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${dependency.mapstruct.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
