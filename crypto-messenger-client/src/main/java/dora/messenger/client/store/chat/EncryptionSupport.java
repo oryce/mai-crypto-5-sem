@@ -23,9 +23,9 @@ final class EncryptionSupport {
         requireNonNull(chat, "chat");
         requireNonNull(random, "random");
 
-        BlockCipher cipher = chat.algorithm().createCipher();
-
-        byte[] iv = new byte[cipher.blockSize()];
+        var cipher = chat.algorithm().createCipher();
+        var initSize = chat.cipherMode().initSize(cipher.blockSize());
+        var iv = new byte[initSize];
         random.nextBytes(iv);
 
         return iv;

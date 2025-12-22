@@ -118,23 +118,60 @@ public final class SymmetricCipher {
 
     public enum CipherModeType {
 
-        CBC(CbcCipherMode::new, ParameterCreator.iv()),
-        CFB(CfbCipherMode::new, ParameterCreator.iv()),
-        CTR(CtrCipherMode::new, ParameterCreator.ctr()),
-        ECB(EcbCipherMode::new, ParameterCreator.none()),
-        OFB((cipher, pool) -> new OfbCipherMode(cipher), ParameterCreator.iv()),
-        PCBC(PcbcCipherMode::new, ParameterCreator.iv()),
-        RANDOM_DELTA(RandomDeltaCipherMode::new, ParameterCreator.randomDelta());
+        CBC(
+            CbcCipherMode::new,
+            ParameterCreator.iv(),
+            InitSizeProvider.blockSize()
+        ),
+
+        CFB(
+            CfbCipherMode::new,
+            ParameterCreator.iv(),
+            InitSizeProvider.blockSize()
+        ),
+
+        CTR(
+            CtrCipherMode::new,
+            ParameterCreator.ctr(),
+            (blockSize) -> blockSize / 2
+        ),
+
+        ECB(
+            EcbCipherMode::new,
+            ParameterCreator.none(),
+            InitSizeProvider.zero()
+        ),
+
+        OFB(
+            (cipher, pool) -> new OfbCipherMode(cipher),
+            ParameterCreator.iv(),
+            InitSizeProvider.blockSize()
+        ),
+
+        PCBC(
+            PcbcCipherMode::new,
+            ParameterCreator.iv(),
+            InitSizeProvider.blockSize()
+        ),
+
+        RANDOM_DELTA(
+            RandomDeltaCipherMode::new,
+            ParameterCreator.randomDelta(),
+            InitSizeProvider.blockSize()
+        );
 
         private final InstanceCreator instanceCreator;
         private final ParameterCreator parametersCreator;
+        private final InitSizeProvider initSizeProvider;
 
         CipherModeType(
             InstanceCreator instanceCreator,
-            ParameterCreator parametersCreator
+            ParameterCreator parametersCreator,
+            InitSizeProvider initSizeProvider
         ) {
             this.instanceCreator = instanceCreator;
             this.parametersCreator = parametersCreator;
+            this.initSizeProvider = initSizeProvider;
         }
 
         public CipherMode createMode(BlockCipher cipher, ForkJoinPool pool) {
@@ -143,6 +180,10 @@ public final class SymmetricCipher {
 
         public Parameters createParameters(byte[] iv, List<?> args) {
             return parametersCreator.create(iv, args);
+        }
+
+        public int initSize(int blockSize) {
+            return initSizeProvider.initSize(blockSize);
         }
 
         @FunctionalInterface
@@ -183,6 +224,26 @@ public final class SymmetricCipher {
             private static <T> @Nullable T argumentAt(List<?> args, int idx) {
                 if (idx >= args.size()) return null;
                 return (T) args.get(idx);
+            }
+        }
+
+        // FIXME (23.12.25, ~oryce):
+        //   This is a band-aid. It informs callers how to generate the IV
+        //   (or nonce, in case of CTR). I don't think there's a better solution:
+        //   the task requires `SymmetricCipher` to have an `iv` argument, so I
+        //   can't pass `Parameters`.
+
+        @FunctionalInterface
+        private interface InitSizeProvider {
+
+            int initSize(int blockSize);
+
+            static InitSizeProvider zero() {
+                return (blockSize) -> 0;
+            }
+
+            static InitSizeProvider blockSize() {
+                return (blockSize) -> blockSize;
             }
         }
     }
