@@ -28,7 +28,7 @@ public class RegisterView extends JPanel {
     private final JTextField firstNameField;
     private final JTextField lastNameField;
     private final JTextField usernameField;
-    private final JTextField passwordField;
+    private final JPasswordField passwordField;
     private final JButton registerButton;
 
     @Inject
@@ -87,7 +87,7 @@ public class RegisterView extends JPanel {
         constraints.insets = new Insets(8, 0, 0, 0);
         add(passwordLabel, constraints);
 
-        passwordField = new JTextField(24);
+        passwordField = new JPasswordField(24);
         constraints.gridy = 8;
         constraints.insets = new Insets(4, 0, 0, 0);
         add(passwordField, constraints);

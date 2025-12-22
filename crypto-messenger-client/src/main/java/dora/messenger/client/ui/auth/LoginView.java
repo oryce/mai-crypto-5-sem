@@ -27,7 +27,7 @@ public class LoginView extends JPanel {
     private final Router router;
 
     private final JTextField usernameField;
-    private final JTextField passwordField;
+    private final JPasswordField passwordField;
     private final JButton loginButton;
 
     @Inject
@@ -64,7 +64,7 @@ public class LoginView extends JPanel {
         constraints.insets = new Insets(8, 0, 0, 0);
         add(passwordLabel, constraints);
 
-        passwordField = new JTextField(24);
+        passwordField = new JPasswordField(24);
         constraints.gridy = 4;
         constraints.insets = new Insets(4, 0, 0, 0);
         add(passwordField, constraints);
