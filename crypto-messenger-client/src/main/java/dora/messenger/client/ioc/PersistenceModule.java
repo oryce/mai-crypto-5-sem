@@ -21,7 +21,7 @@ public class PersistenceModule extends AbstractModule {
     @Provides
     @Singleton
     public Connection connection() throws SQLException {
-        String connectionString = "jdbc:sqlite:messenger.db:messenger";
+        String connectionString = "jdbc:sqlite:messenger.db";
         return DriverManager.getConnection(connectionString);
     }
 
