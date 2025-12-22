@@ -1,5 +1,6 @@
 package dora.messenger.server.chat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dora.messenger.protocol.chat.ChatDto;
 import dora.messenger.server.chat.session.ChatSession;
 import dora.messenger.server.user.User;
@@ -59,7 +60,8 @@ public class Chat {
     @Enumerated(EnumType.STRING)
     private Padding padding;
 
-    @OneToOne(mappedBy = "chat", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // HACK (~oryce): Events should have separate entities.
     private ChatSession session;
 
     public User getOtherUser(User user) {

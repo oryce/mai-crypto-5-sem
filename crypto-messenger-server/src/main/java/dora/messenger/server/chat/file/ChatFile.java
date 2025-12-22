@@ -8,6 +8,7 @@ import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "chat_files")
+@EntityListeners(ChatFileEntityListener.class)
 public class ChatFile {
 
     @Id

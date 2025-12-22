@@ -31,7 +31,7 @@ public class ChatFileStorage {
 
     public void delete(ChatFile file) throws IOException {
         Path filePath = filePath(file);
-        Files.delete(filePath);
+        Files.deleteIfExists(filePath);
     }
 
     private Path filePath(ChatFile file) {

@@ -1,5 +1,6 @@
 package dora.messenger.server.chat.session;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dora.messenger.protocol.chat.session.ChatSessionDto;
 import dora.messenger.server.chat.Chat;
 import dora.messenger.server.chat.file.ChatFile;
@@ -48,7 +49,8 @@ public class ChatSession {
     @Column(name = "established")
     private boolean established;
 
-    @OneToMany(mappedBy = "session", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // HACK (~oryce): Events should have separate entities.
     private List<ChatFile> files;
 
     public boolean isResponder(User user) {

@@ -41,6 +41,7 @@ public class ChatSessionService {
         session.setInitiator(initiator);
         session.setResponder(chat.getOtherUser(initiator));
         sessions.save(session);
+        chat.setSession(session);
 
         ChatSessionInitiationEvent event = new ChatSessionInitiationEvent(
             session.getId(),
