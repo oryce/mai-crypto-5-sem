@@ -11,6 +11,8 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -60,6 +62,7 @@ public class ChatMessageInput extends JPanel {
         add(attachButton, constraints);
 
         inputField = new JTextField();
+        inputField.getDocument().addDocumentListener(new InputDocumentListener());
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.insets = new Insets(0, 8, 0, 0);
         constraints.weightx = 1;
@@ -68,6 +71,7 @@ public class ChatMessageInput extends JPanel {
 
         sendButton = new JButton("Отправить");
         sendButton.addActionListener(new SendActionListener());
+        sendButton.setEnabled(false); // enabled when text is entered
         constraints.fill = GridBagConstraints.NONE;
         constraints.insets = new Insets(0, 8, 0, 0);
         constraints.weightx = 0;
@@ -106,6 +110,29 @@ public class ChatMessageInput extends JPanel {
         attachmentsPanel.setVisible(attachmentsPanel.getComponentCount() > 0);
         attachmentsPanel.revalidate();
         attachmentsPanel.repaint();
+    }
+
+    private class InputDocumentListener implements DocumentListener {
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            updated();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            updated();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            updated();
+        }
+
+        private void updated() {
+            boolean blank = inputField.getText().isBlank();
+            sendButton.setEnabled(!blank);
+        }
     }
 
     private class AttachActionListener implements ActionListener {
