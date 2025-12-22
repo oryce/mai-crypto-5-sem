@@ -2,11 +2,14 @@ package dora.messenger.client;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import dora.messenger.client.api.EventApi;
+import dora.messenger.client.store.ObservableCollection;
+import dora.messenger.client.store.chat.Chat;
 import dora.messenger.client.store.chat.ChatStore;
 import dora.messenger.client.store.session.SessionCredentials;
 import dora.messenger.client.store.session.SessionStore;
 import dora.messenger.client.store.user.UserStore;
 import dora.messenger.client.ui.MessengerFrame;
+import dora.messenger.client.ui.router.ChatRoute;
 import dora.messenger.client.ui.router.Route;
 import dora.messenger.client.ui.router.Router;
 import jakarta.inject.Inject;
@@ -14,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -58,6 +62,33 @@ public class MessengerClientApplication {
             } else {
                 LOGGER.trace("Disconnecting from Event API (session destroyed)");
                 eventApi.disconnect();
+            }
+        });
+
+        // TODO (23.12.25, ~oryce):
+        //   Not sure if it's the right place to put this. Alternatives are:
+        //   `ChatStore` and `ChatList`. `ChatList` uses `Router` to update the
+        //   selected chat. `ChatStore` only manages the chat list.
+        chatStore.getChats().observe(new ObservableCollection.CollectionObserver<>() {
+
+            @Override
+            public void itemAdded(Chat item) {
+            }
+
+            @Override
+            public void itemRemoved(Chat removedChat) {
+                Route currentRoute = router.currentRoute().get();
+
+                // Navigate away from the active chat if it got deleted.
+                if (currentRoute instanceof ChatRoute(Chat currentChat) &&
+                    currentChat.id().equals(removedChat.id())
+                ) {
+                    router.navigate(Route.CONTACTS);
+                }
+            }
+
+            @Override
+            public void valueChanged(Collection<Chat> newValue) {
             }
         });
 
