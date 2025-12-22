@@ -181,7 +181,7 @@ public final class SymmetricCipher {
 
             @SuppressWarnings("unchecked")
             private static <T> @Nullable T argumentAt(List<?> args, int idx) {
-                if (args.size() < idx) return null;
+                if (idx >= args.size()) return null;
                 return (T) args.get(idx);
             }
         }
