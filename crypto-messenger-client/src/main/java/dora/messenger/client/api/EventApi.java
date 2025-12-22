@@ -11,6 +11,7 @@ import jakarta.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ServerHandshake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +20,9 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
@@ -49,6 +53,16 @@ public class EventApi {
 
         client = new Client(endpoint);
         client.connect();
+    }
+
+    private final ScheduledExecutorService reconnectExecutor = Executors.newSingleThreadScheduledExecutor(
+        (runnable) -> new Thread(runnable, "WebSocket-Reconnect-Thread")
+    );
+
+    private void scheduleReconnect() {
+        // TODO (23.12.25, ~oryce):
+        //   Exponential backoff.
+        reconnectExecutor.schedule(client::reconnect, 5, TimeUnit.SECONDS);
     }
 
     public void disconnect() {
@@ -98,7 +112,18 @@ public class EventApi {
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
-            LOGGER.debug("WebSocket connection closed (code={}, reason={}))", code, reason);
+            boolean closedCleanly = code == CloseFrame.NORMAL;
+            LOGGER.debug(
+                "WebSocket connection closed (code={}, reason={}, closed cleanly={}))",
+                code, reason, closedCleanly
+            );
+
+            if (!closedCleanly) {
+                // FIXME (23.12.25, ~oryce):
+                //   Technically an implementation detail.
+                LOGGER.debug("Reconnecting in 5 seconds");
+                scheduleReconnect();
+            }
         }
 
         @Override
