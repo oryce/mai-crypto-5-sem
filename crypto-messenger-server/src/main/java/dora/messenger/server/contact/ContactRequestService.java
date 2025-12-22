@@ -34,6 +34,9 @@ public class ContactRequestService {
 
     @Transactional
     public ContactRequest createRequest(@NotNull User initiator, @NotNull String responderUsername) {
+        if (initiator.getUsername().equals(responderUsername))
+            throw new SelfRequestException();
+
         User responder = users.getByUsername(responderUsername);
 
         if (requests.existsByInitiatorAndResponder(initiator, responder))
@@ -96,6 +99,13 @@ public class ContactRequestService {
 
         requests.delete(request);
         events.publish(request.getInitiator(), new ContactRequestRemovedEvent(request));
+    }
+
+    public static final class SelfRequestException extends RuntimeException {
+
+        public SelfRequestException() {
+            super("Cannot send contact request to self");
+        }
     }
 
     public static final class RequestAlreadyExistsException extends RuntimeException {
