@@ -52,7 +52,12 @@ public class ChatFileStore {
 
         // TODO (20.12.25, ~oryce):
         //   Don't hardcode storage path.
-        storageDirectory = Paths.get("storage");
+        try {
+            storageDirectory = Paths.get("storage");
+            Files.createDirectories(storageDirectory);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Cannot create storage directory", e);
+        }
     }
 
     //region State
