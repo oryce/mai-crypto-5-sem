@@ -16,6 +16,8 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +64,7 @@ public class ChatMessageInput extends JPanel {
         add(attachButton, constraints);
 
         inputField = new JTextField();
+        inputField.addKeyListener(new SendActionListener());
         inputField.getDocument().addDocumentListener(new InputDocumentListener());
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.insets = new Insets(0, 8, 0, 0);
@@ -151,10 +154,30 @@ public class ChatMessageInput extends JPanel {
         }
     }
 
-    private class SendActionListener implements ActionListener {
+    private class SendActionListener implements ActionListener, KeyListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            send();
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER && !e.isShiftDown()) {
+                send();
+                e.consume();
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+        }
+
+        private void send() {
             sendButton.setEnabled(false);
 
             List<ChatFile> attachments = new ArrayList<>();
