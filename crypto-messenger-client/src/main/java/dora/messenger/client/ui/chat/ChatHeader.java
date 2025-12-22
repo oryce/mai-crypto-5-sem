@@ -3,21 +3,20 @@ package dora.messenger.client.ui.chat;
 import dora.messenger.client.persistence.ChatSession;
 import dora.messenger.client.store.chat.Chat;
 import dora.messenger.client.store.chat.ChatSessionStore;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import static java.util.Objects.requireNonNull;
 
 public class ChatHeader extends JPanel {
+
+    private static final Logger LOGGER = LogManager.getLogger(ChatHeader.class);
 
     private final ChatSession chatSession;
     private final ChatSessionStore chatSessionStore;
@@ -47,15 +46,17 @@ public class ChatHeader extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             chatSessionStore.deleteSession(chatSession).whenComplete((nothing, throwable) -> {
-                if (throwable != null) SwingUtilities.invokeLater(() -> cancelFailed(throwable));
+                if (throwable != null) SwingUtilities.invokeLater(() -> disconnectFailed(throwable));
             });
         }
 
-        private void cancelFailed(Throwable throwable) {
+        private void disconnectFailed(Throwable throwable) {
+            LOGGER.error("Cannot delete session", throwable);
+
             JOptionPane.showMessageDialog(
                 SwingUtilities.getWindowAncestor(ChatHeader.this),
-                throwable.getMessage(),
-                "Ошибка удаления соединения",
+                "Произошла ошибка при завершении соединения",
+                "Ошибка",
                 JOptionPane.ERROR_MESSAGE
             );
         }

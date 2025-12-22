@@ -4,20 +4,12 @@ import dora.messenger.client.store.session.SessionStore;
 import dora.messenger.client.ui.router.Route;
 import dora.messenger.client.ui.router.Router;
 import jakarta.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import java.awt.Cursor;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -28,6 +20,8 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 public class LoginView extends JPanel {
+
+    private static final Logger LOGGER = LogManager.getLogger(LoginView.class);
 
     private final SessionStore sessionStore;
     private final Router router;
@@ -120,9 +114,11 @@ public class LoginView extends JPanel {
         private void loginFailure(Throwable throwable) {
             loginButton.setEnabled(true);
 
+            LOGGER.error("Cannot sign in", throwable);
+
             JOptionPane.showMessageDialog(
-                null,
-                throwable.getMessage(),
+                SwingUtilities.getWindowAncestor(LoginView.this),
+                "Произошла ошибка при входе. Проверьте данные и повторите попытку",
                 "Ошибка",
                 JOptionPane.ERROR_MESSAGE
             );

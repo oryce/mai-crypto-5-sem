@@ -4,20 +4,12 @@ import dora.messenger.client.store.user.UserStore;
 import dora.messenger.client.ui.router.Route;
 import dora.messenger.client.ui.router.Router;
 import jakarta.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import java.awt.Cursor;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -27,6 +19,8 @@ import java.util.Map;
 import java.util.Objects;
 
 public class RegisterView extends JPanel {
+
+    private static final Logger LOGGER = LogManager.getLogger(RegisterView.class);
 
     private final UserStore userStore;
     private final Router router;
@@ -147,9 +141,11 @@ public class RegisterView extends JPanel {
         private void registerFailed(Throwable throwable) {
             registerButton.setEnabled(true);
 
+            LOGGER.error("Cannot sign up", throwable);
+
             JOptionPane.showMessageDialog(
-                null,
-                throwable.getMessage(),
+                SwingUtilities.getWindowAncestor(RegisterView.this),
+                "Произошла ошибка при регистрации. Убедитесь, что данные введены корректно",
                 "Ошибка",
                 JOptionPane.ERROR_MESSAGE
             );

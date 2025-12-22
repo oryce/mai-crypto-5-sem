@@ -10,31 +10,14 @@ import dora.messenger.client.store.Computed;
 import dora.messenger.client.store.chat.Chat;
 import dora.messenger.client.store.chat.ChatFileStore;
 import dora.messenger.client.store.user.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JTextArea;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FontMetrics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +38,8 @@ import java.util.concurrent.CompletableFuture;
 import static java.util.Objects.requireNonNull;
 
 public class ChatMessageBubble extends JPanel {
+
+    private static final Logger LOGGER = LogManager.getLogger(ChatMessageBubble.class);
 
     private static final Color TEXT_COLOR = Color.WHITE;
 
@@ -283,10 +268,12 @@ public class ChatMessageBubble extends JPanel {
             try {
                 Desktop.getDesktop().open(new File(file.getLocation()));
             } catch (Exception e) {
+                LOGGER.error("Cannot open file", e);
+
                 JOptionPane.showMessageDialog(
                     SwingUtilities.getWindowAncestor(this),
-                    e.getMessage(),
-                    "Ошибка открытия файла",
+                    "Произошла ошибка при открытии файла. Возможно, отсутствует программа для открытия файла",
+                    "Ошибка",
                     JOptionPane.ERROR_MESSAGE
                 );
             }
@@ -338,9 +325,11 @@ public class ChatMessageBubble extends JPanel {
         private void downloadFailed(Throwable throwable) {
             downloadUnfinished();
 
+            LOGGER.error("Cannot download file", throwable);
+
             JOptionPane.showMessageDialog(
                 SwingUtilities.getWindowAncestor(MessageFileAttachment.this),
-                throwable.getMessage(),
+                "Произошла ошибка при загрузке файла",
                 "Ошибка загрузки файла",
                 JOptionPane.ERROR_MESSAGE
             );

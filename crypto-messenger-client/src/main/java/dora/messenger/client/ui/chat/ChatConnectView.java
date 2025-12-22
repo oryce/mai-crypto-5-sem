@@ -2,25 +2,20 @@ package dora.messenger.client.ui.chat;
 
 import dora.messenger.client.store.chat.Chat;
 import dora.messenger.client.store.chat.ChatSessionStore;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import static java.util.Objects.requireNonNull;
 
 public class ChatConnectView extends JPanel {
+
+    private static final Logger LOGGER = LogManager.getLogger(ChatConnectView.class);
 
     private final Chat chat;
     private final ChatSessionStore chatSessionStore;
@@ -65,10 +60,12 @@ public class ChatConnectView extends JPanel {
         }
 
         private void connectFailed(Throwable throwable) {
+            LOGGER.error("Cannot create session", throwable);
+
             JOptionPane.showMessageDialog(
                 SwingUtilities.getWindowAncestor(ChatConnectView.this),
-                throwable.getMessage(),
-                "Ошибка создания соединения",
+                "Произошла ошибка при создании соединения",
+                "Ошибка",
                 JOptionPane.ERROR_MESSAGE
             );
         }

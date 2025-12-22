@@ -3,17 +3,12 @@ package dora.messenger.client.ui.contact;
 import dora.messenger.client.store.contact.ContactRequest;
 import dora.messenger.client.store.contact.ContactRequest.Direction;
 import dora.messenger.client.store.contact.ContactRequestStore;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import java.awt.EventQueue;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,6 +16,8 @@ import static java.util.Objects.requireNonNull;
 
 public class ContactRequestCard extends JPanel {
 
+    private static final Logger LOGGER = LogManager.getLogger(ContactRequestCard.class);
+    
     private final ContactRequest request;
     private final ContactRequestStore requestStore;
 
@@ -96,21 +93,22 @@ public class ContactRequestCard extends JPanel {
         public void actionPerformed(ActionEvent e) {
             acceptButton.setEnabled(false);
 
-            requestStore.acceptRequest(request)
-                .whenComplete((nothing, throwable) -> {
-                    if (throwable == null) return;
+            requestStore.acceptRequest(request).whenComplete((nothing, throwable) -> {
+                if (throwable != null) EventQueue.invokeLater(() -> acceptFailed(throwable));
+            });
+        }
 
-                    EventQueue.invokeLater(() -> {
-                        acceptButton.setEnabled(true);
+        private void acceptFailed(Throwable throwable) {
+            acceptButton.setEnabled(true);
 
-                        JOptionPane.showMessageDialog(
-                            null,
-                            throwable.getMessage(),
-                            "Ошибка принятия запроса в контакты",
-                            JOptionPane.ERROR_MESSAGE
-                        );
-                    });
-                });
+            LOGGER.error("Cannot accept contact request", throwable);
+            
+            JOptionPane.showMessageDialog(
+                SwingUtilities.getWindowAncestor(ContactRequestCard.this),
+                "Произошла ошибка при принятии запроса в контакты",
+                "Ошибка",
+                JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -120,21 +118,22 @@ public class ContactRequestCard extends JPanel {
         public void actionPerformed(ActionEvent e) {
             rejectButton.setEnabled(false);
 
-            requestStore.rejectRequest(request)
-                .whenComplete((nothing, throwable) -> {
-                    if (throwable == null) return;
+            requestStore.rejectRequest(request).whenComplete((nothing, throwable) -> {
+                if (throwable != null) EventQueue.invokeLater(() -> rejectFailed(throwable));
+            });
+        }
 
-                    EventQueue.invokeLater(() -> {
-                        rejectButton.setEnabled(true);
+        private void rejectFailed(Throwable throwable) {
+            rejectButton.setEnabled(true);
 
-                        JOptionPane.showMessageDialog(
-                            null,
-                            "Не удалось отклонить запрос в контакты",
-                            "Ошибка",
-                            JOptionPane.ERROR_MESSAGE
-                        );
-                    });
-                });
+            LOGGER.error("Cannot reject contact request", throwable);
+            
+            JOptionPane.showMessageDialog(
+                SwingUtilities.getWindowAncestor(ContactRequestCard.this),
+                "Произошла ошибка при отклонении запроса в контакты",
+                "Ошибка",
+                JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -144,21 +143,22 @@ public class ContactRequestCard extends JPanel {
         public void actionPerformed(ActionEvent e) {
             cancelButton.setEnabled(false);
 
-            requestStore.cancelRequest(request)
-                .whenComplete((nothing, throwable) -> {
-                    if (throwable == null) return;
+            requestStore.cancelRequest(request).whenComplete((nothing, throwable) -> {
+                if (throwable != null) EventQueue.invokeLater(() -> cancelFailed(throwable));
+            });
+        }
 
-                    EventQueue.invokeLater(() -> {
-                        cancelButton.setEnabled(true);
+        private void cancelFailed(Throwable throwable) {
+            cancelButton.setEnabled(true);
 
-                        JOptionPane.showMessageDialog(
-                            null,
-                            "Не удалось отменить запрос в контакты",
-                            "Ошибка",
-                            JOptionPane.ERROR_MESSAGE
-                        );
-                    });
-                });
+            LOGGER.error("Cannot cancel contact request", throwable);
+
+            JOptionPane.showMessageDialog(
+                SwingUtilities.getWindowAncestor(ContactRequestCard.this),
+                "Произошла ошибка при отмене запроса в контакты",
+                "Ошибка",
+                JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }

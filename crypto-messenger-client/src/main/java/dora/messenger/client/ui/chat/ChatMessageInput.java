@@ -6,22 +6,12 @@ import dora.messenger.client.persistence.ChatSession;
 import dora.messenger.client.store.chat.Chat;
 import dora.messenger.client.store.chat.ChatFileStore;
 import dora.messenger.client.store.chat.ChatMessageStore;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.file.Path;
@@ -34,6 +24,8 @@ import java.util.concurrent.CompletableFuture;
 import static java.util.Objects.requireNonNull;
 
 public class ChatMessageInput extends JPanel {
+
+    private static final Logger LOGGER = LogManager.getLogger(ChatMessageInput.class);
 
     private final Chat chat;
     private final ChatSession chatSession;
@@ -170,10 +162,12 @@ public class ChatMessageInput extends JPanel {
                 attachment.setEnabled(true);
             }
 
+            LOGGER.error("Cannot send message", throwable);
+
             JOptionPane.showMessageDialog(
                 SwingUtilities.getWindowAncestor(ChatMessageInput.this),
-                throwable.getMessage(),
-                "Ошибка отправки сообщения",
+                "Произошла ошибка при отправке сообщения",
+                "Ошибка",
                 JOptionPane.ERROR_MESSAGE
             );
         }
@@ -265,10 +259,12 @@ public class ChatMessageInput extends JPanel {
         }
 
         private void uploadFailed(Throwable throwable) {
+            LOGGER.error("Cannot upload file", throwable);
+
             JOptionPane.showMessageDialog(
                 SwingUtilities.getWindowAncestor(AttachmentItem.this),
-                throwable.getMessage(),
-                "Ошибка загрузки файла",
+                "Произошла ошибка при загрузке файла",
+                "Ошибка",
                 JOptionPane.ERROR_MESSAGE
             );
 

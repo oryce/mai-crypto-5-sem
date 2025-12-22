@@ -6,28 +6,20 @@ import dora.messenger.client.store.chat.Chat.Algorithm;
 import dora.messenger.client.store.chat.Chat.DiffieHellmanGroupId;
 import dora.messenger.client.store.chat.ChatStore;
 import dora.messenger.client.store.user.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import static java.util.Objects.requireNonNull;
 
 public class CreateChatDialog extends JDialog {
+
+    private static final Logger LOGGER = LogManager.getLogger(CreateChatDialog.class);
 
     private final ChatStore chatStore;
     private final User participant;
@@ -156,10 +148,12 @@ public class CreateChatDialog extends JDialog {
         private void createFailed(Throwable throwable) {
             setFormEnabled(true);
 
+            LOGGER.error("Cannot create chat", throwable);
+
             JOptionPane.showMessageDialog(
                 CreateChatDialog.this,
-                throwable.getMessage(),
-                "Ошибка создания чата",
+                "Произошла ошибка при создании чата",
+                "Ошибка",
                 JOptionPane.ERROR_MESSAGE
             );
         }

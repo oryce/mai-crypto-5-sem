@@ -7,26 +7,20 @@ import dora.messenger.client.store.chat.ChatStore;
 import dora.messenger.client.ui.router.ChatRoute;
 import dora.messenger.client.ui.router.Route;
 import dora.messenger.client.ui.router.Router;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.util.Collection;
 
 import static java.util.Objects.requireNonNull;
 
 public class ChatList extends JPanel {
+
+    private static final Logger LOGGER = LogManager.getLogger(ChatList.class);
 
     private final ChatStore chatStore;
     private final Router router;
@@ -108,14 +102,18 @@ public class ChatList extends JPanel {
 
     private void deleteChat(Chat chat) {
         chatStore.deleteChat(chat).whenComplete((nothing, throwable) -> {
-            if (throwable == null) return;
-
-            EventQueue.invokeLater(() -> JOptionPane.showMessageDialog(
-                SwingUtilities.getWindowAncestor(this),
-                throwable.getMessage(),
-                "Ошибка удаления чата",
-                JOptionPane.ERROR_MESSAGE
-            ));
+            if (throwable != null) EventQueue.invokeLater(() -> deleteFailed(throwable));
         });
+    }
+
+    private void deleteFailed(Throwable throwable) {
+        LOGGER.error("Cannot delete chat", throwable);
+
+        JOptionPane.showMessageDialog(
+            SwingUtilities.getWindowAncestor(this),
+            "Произошла ошибка при удалении чата",
+            "Ошибка",
+            JOptionPane.ERROR_MESSAGE
+        );
     }
 }

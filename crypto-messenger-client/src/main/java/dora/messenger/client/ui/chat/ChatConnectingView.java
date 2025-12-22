@@ -2,25 +2,20 @@ package dora.messenger.client.ui.chat;
 
 import dora.messenger.client.persistence.ChatSession;
 import dora.messenger.client.store.chat.ChatSessionStore;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import static java.util.Objects.requireNonNull;
 
 public class ChatConnectingView extends JPanel {
+
+    private static final Logger LOGGER = LogManager.getLogger(ChatConnectingView.class);
 
     private final ChatSession chatSession;
     private final ChatSessionStore chatSessionStore;
@@ -65,10 +60,12 @@ public class ChatConnectingView extends JPanel {
         }
 
         private void cancelFailed(Throwable throwable) {
+            LOGGER.error("Cannot delete session", throwable);
+
             JOptionPane.showMessageDialog(
                 SwingUtilities.getWindowAncestor(ChatConnectingView.this),
-                throwable.getMessage(),
-                "Ошибка отмены соединения",
+                "Произошла ошибка при отмене соединения",
+                "Ошибка",
                 JOptionPane.ERROR_MESSAGE
             );
         }

@@ -6,17 +6,12 @@ import dora.messenger.client.store.user.User;
 import dora.messenger.client.store.user.UserStore;
 import dora.messenger.client.ui.router.Route;
 import dora.messenger.client.ui.router.Router;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-import java.awt.EventQueue;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -25,6 +20,8 @@ import java.awt.event.MouseEvent;
 import static java.util.Objects.requireNonNull;
 
 public class UserCard extends JPanel {
+
+    private static final Logger LOGGER = LogManager.getLogger(UserCard.class);
 
     private final SessionStore sessionStore;
     private final Router router;
@@ -118,10 +115,12 @@ public class UserCard extends JPanel {
         }
 
         private void logoutFailed(Throwable throwable) {
+            LOGGER.error("Cannot sign out", throwable);
+
             JOptionPane.showMessageDialog(
-                null,
-                throwable.getMessage(),
-                "Ошибка выхода",
+                SwingUtilities.getWindowAncestor(UserCard.this),
+                "Произошла ошибка при выходе",
+                "Ошибка",
                 JOptionPane.ERROR_MESSAGE
             );
         }
